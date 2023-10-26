@@ -1,0 +1,48 @@
+{
+  "name": "escolalms/recommender",
+  "description": "Escola Headless LMS Recommender",
+  "type": "package",
+  "require": {
+    "php": "^7.4|^8.0|^8.1",
+    "escolalms/auth": "^0",
+    "escolalms/core": "^1",
+    "escolalms/courses": "^0.4",
+    "escolalms/topic-types": "^0",
+    "escolalms/settings": "^0",
+    "laravel/framework": "^8|^9"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0",
+    "orchestra/testbench": ">=5.0",
+    "darkaonline/l5-swagger": "8.1.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Tomasz Smolarek",
+      "email": "tomasz.smolarek@escolasoft.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "EscolaLms\\Recommender\\": "src",
+      "EscolaLms\\Recommender\\Tests\\": "tests",
+      "EscolaLms\\Recommender\\Database\\Factories\\": "database/factories",
+      "EscolaLms\\Recommender\\Database\\Seeders\\": "database/seeders"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "EscolaLms\\Recommender\\EscolaLmsRecommenderServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "optimize-autoloader": false,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
