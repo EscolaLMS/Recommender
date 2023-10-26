@@ -3,7 +3,7 @@
 namespace EscolaLms\Recommender\Repositories;
 
 use EscolaLms\Core\Repositories\BaseRepository;
-use EscolaLms\Courses\Models\Topic;
+use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;

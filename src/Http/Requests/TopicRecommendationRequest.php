@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Recommender\Http\Requests;
 
-use EscolaLms\Courses\Models\Lesson;
+use EscolaLms\Recommender\Models\Lesson;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 

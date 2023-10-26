@@ -4,8 +4,8 @@ namespace EscolaLms\Recommender\Policies;
 
 use EscolaLms\Auth\Models\User;
 use EscolaLms\Courses\Enum\CoursesPermissionsEnum;
-use EscolaLms\Courses\Models\Course;
-use EscolaLms\Courses\Models\Lesson;
+use EscolaLms\Recommender\Models\Course;
+use EscolaLms\Recommender\Models\Lesson;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RecommenderPolicy

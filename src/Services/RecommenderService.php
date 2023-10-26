@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Recommender\Services;
 
-use EscolaLms\Courses\Models\Topic;
+use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
