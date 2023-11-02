@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Services;
 
+use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
@@ -194,11 +195,11 @@ class RecommenderService implements RecommenderServiceContract
      */
     private function getResult(string $url, array $data): array
     {
-        if (!config('escolalms_recommender.api_url')) {
+        if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url')) {
             throw new RecommenderDisabledException('Recommender API URL is not set!');
         }
 
-        return Http::post(config('escolalms_recommender.api_url') . $url, $data)
+        return Http::post(config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url') . $url, $data)
             ->collect()
             ->get('data');
     }

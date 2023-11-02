@@ -4,6 +4,7 @@ namespace EscolaLms\Recommender;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Recommender\Providers\AuthServiceProvider;
+use EscolaLms\Recommender\Providers\EventServiceProvider;
 use EscolaLms\Recommender\Providers\SettingsServiceProvider;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Repositories\TopicRepository;
@@ -36,6 +37,7 @@ class EscolaLmsRecommenderServiceProvider extends ServiceProvider
 
         $this->app->register(SettingsServiceProvider::class);
         $this->app->register(AuthServiceProvider::class);
+        $this->app->register(EventServiceProvider::class);
         $this->app->register(EscolaLmsSettingsServiceProvider::class);
         $this->app->register(EscolaLmsAuthServiceProvider::class);
     }

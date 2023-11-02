@@ -9,6 +9,7 @@ use EscolaLms\Settings\Database\Seeders\PermissionTableSeeder;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 class SettingsTest extends TestCase
 {
@@ -29,6 +30,10 @@ class SettingsTest extends TestCase
 
     public function testAdministrableConfigApi(): void
     {
+        Http::fakeSequence()
+            ->push([])
+            ->push([]);
+
         $user = config('auth.providers.users.model')::factory()->create();
         $user->guard_name = 'api';
         $user->assignRole('admin');
@@ -36,6 +41,8 @@ class SettingsTest extends TestCase
         $configKey = EscolaLmsRecommenderServiceProvider::CONFIG_KEY;
 
         $apiUrl = $this->faker->url;
+        $courseModel = '{"data": "course"}';
+        $exerciseModel = '{"data": "exercise"}';
 
         $this->actingAs($user, 'api')
             ->postJson('/api/admin/config',
@@ -44,6 +51,14 @@ class SettingsTest extends TestCase
                         [
                             'key' => $configKey . '.api_url',
                             'value' => $apiUrl,
+                        ],
+                        [
+                            'key' => $configKey . '.course_model',
+                            'value' => $courseModel,
+                        ],
+                        [
+                            'key' => $configKey . '.exercise_model',
+                            'value' => $exerciseModel,
                         ],
                     ]
                 ]
@@ -64,13 +79,35 @@ class SettingsTest extends TestCase
                         'value' => $apiUrl,
                         'readonly' => false,
                     ],
+                    'course_model' => [
+                        'full_key' => $configKey . '.course_model',
+                        'key' => 'course_model',
+                        'public' => false,
+                        'rules' => [
+                            'string'
+                        ],
+                        'value' => $courseModel,
+                        'readonly' => false,
+                    ],
+                    'exercise_model' => [
+                        'full_key' => $configKey . '.exercise_model',
+                        'key' => 'exercise_model',
+                        'public' => false,
+                        'rules' => [
+                            'string'
+                        ],
+                        'value' => $exerciseModel,
+                        'readonly' => false,
+                    ],
                 ],
             ]);
 
         $this->getJson('/api/config')
             ->assertOk()
             ->assertJsonMissing([
-                'api_url' => $apiUrl
+                'api_url' => $apiUrl,
+                'course_model' => $courseModel,
+                'exercise_model' => $exerciseModel,
             ]);
     }
 }
