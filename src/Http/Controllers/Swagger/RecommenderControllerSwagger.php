@@ -18,7 +18,7 @@ interface RecommenderControllerSwagger
      *          {"passport": {}},
      *      },
      *      @OA\Parameter(
-     *          name="id",
+     *          name="courseId",
      *          description="ID of course",
      *          @OA\Schema(
      *             type="integer",
@@ -62,7 +62,7 @@ interface RecommenderControllerSwagger
      *          {"passport": {}},
      *      },
      *      @OA\Parameter(
-     *          name="id",
+     *          name="lessonId",
      *          description="ID of lesson",
      *          @OA\Schema(
      *             type="integer",
