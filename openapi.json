@@ -15,7 +15,7 @@
                 "operationId": "523315d1a255465a755fc83dc32e9ecf",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "courseId",
                         "in": "path",
                         "description": "ID of course",
                         "required": true,
@@ -64,7 +64,7 @@
                 "operationId": "6fc3b0727d74285847213bc8f7aae3cb",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "lessonId",
                         "in": "path",
                         "description": "ID of lesson",
                         "required": true,
