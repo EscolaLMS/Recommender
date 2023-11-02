@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
-class UpdateSettingsInExternalService
+class UpdateRecommenderModels
 {
     private const COURSE_KEY = 'course';
 
