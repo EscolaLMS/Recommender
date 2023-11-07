@@ -20,6 +20,18 @@ class TopicRepository extends BaseRepository implements TopicRepositoryContract
         return Topic::class;
     }
 
+
+    public function countTopicByCourseId(int $courseId): int
+    {
+        return $this->model
+            ->newQuery()
+            ->whereHas('lesson', fn(Builder $query) => $query
+                ->whereHas('course', fn(Builder $query) => $query
+                    ->where('id', $courseId)
+                )
+            )
+            ->count();
+    }
     public function getAllByCourseId(int $courseId, ?string $orderDir = 'desc'): Collection
     {
         return $this->model

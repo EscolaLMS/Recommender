@@ -20,6 +20,9 @@ class RecommenderControllerTest extends TestCase
         parent::setUp();
 
         $this->seed(CoursesPermissionSeeder::class);
+
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
     }
 
     public function testCourseRecommendation(): void

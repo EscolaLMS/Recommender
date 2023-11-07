@@ -48,6 +48,14 @@ trait CreatesCourse
     {
         /** @var Course $course */
         $course = Course::factory()->create();
+
+        $this->createLessonWithTopics($course, $topicTypesClasses);
+
+        return $course;
+    }
+
+    public function createLessonWithTopics(Course $course, array $topicTypesClasses): Lesson
+    {
         $lesson = Lesson::factory()->create(['course_id' => $course->getKey()]);
         $order = count($topicTypesClasses);
 
@@ -67,7 +75,7 @@ trait CreatesCourse
             $topic->topicable()->associate($topicable)->save();
         }
 
-        return $course;
+        return $lesson;
     }
 
     private function getTopicableFactory(): Factory

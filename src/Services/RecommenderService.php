@@ -111,6 +111,10 @@ class RecommenderService implements RecommenderServiceContract
 
     public function makeCourseData(int $courseId): array
     {
+        if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model')) {
+            throw new RecommenderDisabledException('Recommender course model is not set!');
+        }
+
         $topics = $this->topicRepository->getAllByCourseId($courseId);
 
         $keys = $topics
@@ -124,6 +128,7 @@ class RecommenderService implements RecommenderServiceContract
             ->filter()
             ->values()
             ->toArray();
+
 
         $dataset = array_fill_keys($keys, 0);
 
@@ -149,11 +154,17 @@ class RecommenderService implements RecommenderServiceContract
 
     public function makeTopicData(int $lessonId): array
     {
-        $step = 5;
+        if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model')) {
+            throw new RecommenderDisabledException('Recommender exercise model is not set!');
+        }
+
+        $limit = 5;
         $marker = 1.0;
         $topics = $this->topicRepository->getAllByLessonId($lessonId);
-        $topicsCount = $topics->count();
-        $topicsLimit = $topics->take($step);
+        $courseId = $topics->first()->lesson->course_id;
+        $topicsCount = $this->topicRepository->countTopicByCourseId($courseId);
+        $topicsLimit = $topics->take($limit);
+        $step = min($limit, $topicsLimit->count());
 
         $dataset = [
             'question_number' => ++$topicsCount
@@ -193,13 +204,17 @@ class RecommenderService implements RecommenderServiceContract
     /**
      * @throws RecommenderDisabledException
      */
-    private function getResult(string $url, array $data): array
+    private function getResult(string $url, array $data): ?array
     {
         if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url')) {
             throw new RecommenderDisabledException('Recommender API URL is not set!');
         }
 
-        return Http::post(config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url') . $url, $data)
+        $body = empty($data) ? (object) [] : $data;
+
+        return Http::withBody(json_encode($body), 'application/json')
+            ->post(config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url') . $url)
+            ->throw()
             ->collect()
             ->get('data');
     }

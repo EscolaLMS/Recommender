@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Recommender\Tests\Feature;
 
+use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
+use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
@@ -10,6 +12,8 @@ use EscolaLms\TopicTypes\Models\TopicContent\OEmbed;
 use EscolaLms\TopicTypes\Models\TopicContent\PDF;
 use EscolaLms\TopicTypes\Models\TopicContent\RichText;
 use EscolaLms\TopicTypes\Models\TopicContent\Video;
+use Illuminate\Support\Facades\Config;
+
 class RecommenderServiceTest extends TestCase
 {
     use CreatesCourse;
@@ -21,6 +25,9 @@ class RecommenderServiceTest extends TestCase
         parent::setUp();
 
         $this->recommenderService = app()->make(RecommenderServiceContract::class);
+
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
     }
 
     public function testCourseMakeData(): void
@@ -50,20 +57,66 @@ class RecommenderServiceTest extends TestCase
         $this->assertArrayNotHasKey('OEmbed_length', $result);
     }
 
+    public function testCourseMakeDataModelNotSet(): void
+    {
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model');
+
+        $course = $this->createCourseWithTopicTypes([
+            PDF::class,
+            OEmbed::class,
+            Video::class,
+            RichText::class,
+            Image::class,
+            PDF::class,
+            Video::class,
+        ]);
+
+        $this->expectException(RecommenderDisabledException::class);
+        $this->expectExceptionMessage('Recommender course model is not set!');
+
+        $this->recommenderService->makeCourseData($course->getKey());
+    }
+
     public function testTopicMakeData(): void
     {
-        $topicTypes = [PDF::class, OEmbed::class, Video::class, RichText::class, Image::class, PDF::class, Video::class];
-        $course = $this->createCourseWithTopicTypes($topicTypes);
+        $lesson1TopicTypes = [PDF::class, OEmbed::class, Video::class, RichText::class, Image::class, PDF::class, Video::class];
+        $lesson2TopicTypes = [OEmbed::class, RichText::class, Video::class, OEmbed::class];
+        $course = $this->createCourse();
+        $lesson1 = $this->createLessonWithTopics($course, $lesson1TopicTypes);
+        $lesson2 = $this->createLessonWithTopics($course, $lesson2TopicTypes);
 
-        $result = $this->recommenderService->makeTopicData($course->lessons->first()->getKey());
+        $result = $this->recommenderService->makeTopicData($lesson1->getKey());
 
         $this->assertEquals([
-            'question_number' => count($topicTypes) + 1,
+            'question_number' => count($lesson1TopicTypes) + count($lesson2TopicTypes) + 1,
             'PDF_5' => 1.0,
             'OEmbed_4' => 1.0,
             'Video_3' => 1.0,
             'RichText_2' => 1.0,
             'Image_1' => 1.0,
         ], $result);
+
+        $result = $this->recommenderService->makeTopicData($lesson2->getKey());
+
+        $this->assertEquals([
+            'question_number' => count($lesson1TopicTypes) + count($lesson2TopicTypes) + 1,
+            'OEmbed_4' => 1.0,
+            'RichText_3' => 1.0,
+            'Video_2' => 1.0,
+            'OEmbed_1' => 1.0,
+        ], $result);
+    }
+
+    public function testTopicMakeDataModelNotSet(): void
+    {
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model');
+
+        $course = $this->createCourse();
+        $lesson1 = $this->createLessonWithTopics($course, [PDF::class, OEmbed::class, Video::class, RichText::class, Image::class, PDF::class, Video::class]);
+
+        $this->expectException(RecommenderDisabledException::class);
+        $this->expectExceptionMessage('Recommender exercise model is not set!');
+
+        $this->recommenderService->makeTopicData($lesson1->getKey());
     }
 }
