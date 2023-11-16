@@ -164,7 +164,7 @@ class RecommenderService implements RecommenderServiceContract
         $courseId = $topics->first()->lesson->course_id;
         $topicsCount = $this->topicRepository->countTopicByCourseId($courseId);
         $topicsLimit = $topics->take($limit);
-        $step = min($limit, $topicsLimit->count());
+        $step = 1;
 
         $dataset = [
             'question_number' => ++$topicsCount
@@ -175,12 +175,12 @@ class RecommenderService implements RecommenderServiceContract
             $key = $this->getDatasetKey($topic);
 
             if (empty($key)) {
-                $step--;
+                $step++;
                 continue;
             }
 
             $dataset[$key . '_' . $step] = $marker;
-            $step--;
+            $step++;
         }
 
         return $dataset;
@@ -204,7 +204,7 @@ class RecommenderService implements RecommenderServiceContract
     /**
      * @throws RecommenderDisabledException
      */
-    private function getResult(string $url, array $data): ?array
+    private function getResult(string $url, array $data): array
     {
         if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url')) {
             throw new RecommenderDisabledException('Recommender API URL is not set!');

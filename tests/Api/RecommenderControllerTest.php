@@ -28,9 +28,9 @@ class RecommenderControllerTest extends TestCase
     public function testCourseRecommendation(): void
     {
         Http::fakeSequence()
-            ->push(
-                ['data' => [$this->faker->randomFloat()]]
-            );
+            ->push(['data' => [
+                'value' => $this->faker->randomFloat()]
+            ]);
 
         $this
             ->actingAs($this->makeAdmin(), 'api')

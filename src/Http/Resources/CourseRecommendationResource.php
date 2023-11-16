@@ -9,7 +9,7 @@ class CourseRecommendationResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'probability' => $this[0] ? $this[0] : null,
+            'probability' => $this['value'] ? $this['value'] : null,
         ];
     }
 }

@@ -89,21 +89,21 @@ class RecommenderServiceTest extends TestCase
 
         $this->assertEquals([
             'question_number' => count($lesson1TopicTypes) + count($lesson2TopicTypes) + 1,
-            'PDF_5' => 1.0,
-            'OEmbed_4' => 1.0,
-            'Video_3' => 1.0,
-            'RichText_2' => 1.0,
-            'Image_1' => 1.0,
+            'Video_1' => 1.0,
+            'PDF_2' => 1.0,
+            'Image_3' => 1.0,
+            'RichText_4' => 1.0,
+            'Video_5' => 1.0,
         ], $result);
 
         $result = $this->recommenderService->makeTopicData($lesson2->getKey());
 
         $this->assertEquals([
             'question_number' => count($lesson1TopicTypes) + count($lesson2TopicTypes) + 1,
-            'OEmbed_4' => 1.0,
-            'RichText_3' => 1.0,
-            'Video_2' => 1.0,
             'OEmbed_1' => 1.0,
+            'Video_2' => 1.0,
+            'RichText_3' => 1.0,
+            'OEmbed_4' => 1.0,
         ], $result);
     }
 

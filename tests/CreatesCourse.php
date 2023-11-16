@@ -57,7 +57,7 @@ trait CreatesCourse
     public function createLessonWithTopics(Course $course, array $topicTypesClasses): Lesson
     {
         $lesson = Lesson::factory()->create(['course_id' => $course->getKey()]);
-        $order = count($topicTypesClasses);
+        $order = 1;
 
         foreach ($topicTypesClasses as $topicTypeClass) {
             $topicable = $topicTypeClass::factory()->make();
@@ -71,7 +71,7 @@ trait CreatesCourse
             }
             $topicable->save();
 
-            $topic = Topic::factory()->create(['lesson_id' => $lesson->id, 'order' => $order--]);
+            $topic = Topic::factory()->create(['lesson_id' => $lesson->id, 'order' => $order++]);
             $topic->topicable()->associate($topicable)->save();
         }
 
