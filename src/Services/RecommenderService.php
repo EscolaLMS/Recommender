@@ -204,7 +204,7 @@ class RecommenderService implements RecommenderServiceContract
     /**
      * @throws RecommenderDisabledException
      */
-    private function getResult(string $url, array $data): ?array
+    private function getResult(string $url, array $data): array
     {
         if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url')) {
             throw new RecommenderDisabledException('Recommender API URL is not set!');
