@@ -3,13 +3,13 @@
   "description": "Escola Headless LMS Recommender",
   "type": "package",
   "require": {
-    "php": "^7.4|^8.0|^8.1",
+    "php": ">=7.4",
     "escolalms/auth": "^0",
     "escolalms/core": "^1",
     "escolalms/courses": "^0.4",
     "escolalms/topic-types": "^0",
     "escolalms/settings": "^0",
-    "laravel/framework": "^8|^9"
+    "laravel/framework": ">=8.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
