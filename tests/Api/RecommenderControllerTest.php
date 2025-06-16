@@ -23,6 +23,7 @@ class RecommenderControllerTest extends TestCase
 
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled', true);
     }
 
     public function testCourseRecommendation(): void
@@ -135,5 +136,26 @@ class RecommenderControllerTest extends TestCase
         $this
             ->getJson('api/admin/recommender/lesson/' . $this->createCourseWithStructure()->lessons->first()->getKey() . '/topic')
             ->assertUnauthorized();
+    }
+
+    public function testRecommenderDisabled(): void
+    {
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled', false);
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson('api/admin/recommender/course/' . $this->createCourseWithStructure()->getKey())
+            ->assertUnprocessable()
+            ->assertJson([
+                'message' => 'Recommender is disabled.'
+            ]);
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson('api/admin/recommender/lesson/' . $this->createCourseWithStructure()->lessons->first()->getKey() . '/topic')
+            ->assertUnprocessable()
+            ->assertJson([
+                'message' => 'Recommender is disabled.'
+            ]);
     }
 }

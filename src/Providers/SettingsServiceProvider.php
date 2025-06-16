@@ -19,6 +19,7 @@ class SettingsServiceProvider extends ServiceProvider
             AdministrableConfig::registerConfig(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.api_url', ['string'], false, false);
             AdministrableConfig::registerConfig(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', ['string'], false, false);
             AdministrableConfig::registerConfig(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', ['string'], false, false);
+            AdministrableConfig::registerConfig(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled', ['required', 'boolean'], true, false);
         }
     }
 }

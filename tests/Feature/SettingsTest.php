@@ -40,6 +40,7 @@ class SettingsTest extends TestCase
 
         $configKey = EscolaLmsRecommenderServiceProvider::CONFIG_KEY;
 
+        $enabled = $this->faker->boolean;
         $apiUrl = $this->faker->url;
         $courseModel = '{"data": "course"}';
         $exerciseModel = '{"data": "exercise"}';
@@ -48,6 +49,10 @@ class SettingsTest extends TestCase
             ->postJson('/api/admin/config',
                 [
                     'config' => [
+                        [
+                            'key' => $configKey . '.enabled',
+                            'value' => $enabled,
+                        ],
                         [
                             'key' => $configKey . '.api_url',
                             'value' => $apiUrl,
@@ -69,6 +74,16 @@ class SettingsTest extends TestCase
             ->assertOk()
             ->assertJsonFragment([
                 $configKey => [
+                    'enabled' => [
+                        'full_key' => $configKey . '.enabled',
+                        'key' => 'enabled',
+                        'public' => true,
+                        'rules' => [
+                            'required', 'boolean'
+                        ],
+                        'value' => $enabled,
+                        'readonly' => false,
+                    ],
                     'api_url' => [
                         'full_key' => $configKey . '.api_url',
                         'key' => 'api_url',
