@@ -101,11 +101,19 @@ class RecommenderService implements RecommenderServiceContract
 
     public function completionOfCourse(int $courseId): array
     {
+        if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled')) {
+            throw new RecommenderDisabledException('Recommender is disabled.');
+        }
+
         return $this->getResult('course', $this->makeCourseData($courseId));
     }
 
     public function matchTopicType(int $lessonId): array
     {
+        if (!config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled')) {
+            throw new RecommenderDisabledException('Recommender is disabled.');
+        }
+
         return $this->getResult('exercise/match', $this->makeTopicData($lessonId));
     }
 

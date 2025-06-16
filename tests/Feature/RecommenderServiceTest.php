@@ -28,6 +28,7 @@ class RecommenderServiceTest extends TestCase
 
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.enabled', true);
     }
 
     public function testCourseMakeData(): void
