@@ -4,12 +4,15 @@ namespace EscolaLms\Recommender\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Recommender\Http\Controllers\Swagger\RecommenderControllerSwagger;
+use EscolaLms\Recommender\Http\Requests\AggregatedFrameRequest;
 use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use EscolaLms\Recommender\Http\Resources\CourseRecommendationResource;
 use EscolaLms\Recommender\Http\Resources\TopicRecommendationResource;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
+use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class RecommenderController extends EscolaLmsBaseController implements RecommenderControllerSwagger
 {
@@ -38,5 +41,13 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
             TopicRecommendationResource::make($result),
             __('Topic recommendation retrieved successfully')
         );
+    }
+
+    public function aggregateFrameSave(AggregatedFrameRequest $request): \Illuminate\Http\Response
+    {
+        $dto = new AggregatedFrameDto($request->all());
+        $this->recommenderService->aggregateFrame($dto);
+
+        return Response::noContent();
     }
 }

@@ -3,10 +3,13 @@
 namespace EscolaLms\Recommender\Services;
 
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
-use EscolaLms\Recommender\Models\Topic;
+use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
+use EscolaLms\Recommender\Models\AggregatedFrame;
+use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
+use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
 use Illuminate\Support\Facades\Http;
 
@@ -225,5 +228,12 @@ class RecommenderService implements RecommenderServiceContract
             ->throw()
             ->collect()
             ->get('data');
+    }
+
+    public function aggregateFrame(AggregatedFrameDto $dto): void
+    {
+        $aggregatedFrame = AggregatedFrame::query()->updateOrCreate(['external_id' => $dto->getExternalId()], $dto->toArray());
+
+        AggregatedFrameStored::dispatch($aggregatedFrame);
     }
 }

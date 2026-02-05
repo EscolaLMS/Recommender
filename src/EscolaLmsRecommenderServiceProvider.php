@@ -3,6 +3,7 @@
 namespace EscolaLms\Recommender;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
+use EscolaLms\Recommender\Http\Middleware\VerifySignature;
 use EscolaLms\Recommender\Providers\AuthServiceProvider;
 use EscolaLms\Recommender\Providers\EventServiceProvider;
 use EscolaLms\Recommender\Providers\SettingsServiceProvider;
@@ -44,7 +45,11 @@ class EscolaLmsRecommenderServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $router = $this->app->get('router');
+        $router->aliasMiddleware('verifySignature', VerifySignature::class);
+
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         if ($this->app->runningInConsole()) {
             $this->bootForConsole();
