@@ -34,6 +34,9 @@ jobs:
       - name: Update composer
         run: composer update
 
+      - name: Install Doctrine DBAL
+        run: composer require --dev doctrine/dbal
+
       - name: Clear config
         run: vendor/bin/testbench config:clear
 
