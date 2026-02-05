@@ -19,10 +19,10 @@ return new class extends Migration
             $table->unsignedInteger('external_id');
             $table->string('model_type');
             $table->string('model_id');
-            $table->timestamp('term');
+            $table->dateTime('term');
 
-            $table->timestamp('window_start')->index();
-            $table->timestamp('window_end')->index();
+            $table->dateTime('window_start')->index();
+            $table->dateTime('window_end')->index();
             $table->unsignedInteger('count')->default(0);
 
             $table->decimal('sum_attention', 30, 25)->nullable();
@@ -52,8 +52,8 @@ return new class extends Migration
             $table->decimal('median_emotions_sad', 30, 25)->nullable();
             $table->decimal('median_emotions_surprised', 30, 25)->nullable();
 
-            $table->timestamp('aggregated_at')->nullable();
-            $table->timestamp('send_at')->nullable();
+            $table->dateTime('aggregated_at')->nullable();
+            $table->dateTime('send_at')->nullable();
 
             $table->boolean('should_break')->nullable();
             $table->decimal('break_confidence', 30, 25)->nullable();
