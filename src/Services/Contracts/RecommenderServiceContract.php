@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Recommender\Services\Contracts;
 
+use EscolaLms\Recommender\Dto\AggregatedFrameDto;
+
 interface RecommenderServiceContract
 {
     public function makeCourseData(int $courseId): array;
@@ -11,4 +13,6 @@ interface RecommenderServiceContract
     public function makeTopicData(int $lessonId): array;
 
     public function matchTopicType(int $lessonId): array;
+
+    public function aggregateFrame(AggregatedFrameDto $dto): void;
 }

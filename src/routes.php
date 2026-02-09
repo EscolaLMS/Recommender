@@ -9,3 +9,9 @@ Route::prefix('api/admin/recommender')
         Route::get('/course/{courseId}', [RecommenderController::class, 'course']);
         Route::get('/lesson/{lessonId}/topic', [RecommenderController::class, 'topic']);
     });
+
+Route::prefix('api/recommender')
+    ->middleware('verifySignature')
+    ->group(function () {
+        Route::post('/aggregated-frames/save', [RecommenderController::class, 'aggregateFrameSave']);
+    });
