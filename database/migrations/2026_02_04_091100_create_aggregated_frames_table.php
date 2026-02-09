@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->unsignedInteger('external_id');
             $table->string('model_type');
-            $table->string('model_id');
+            $table->unsignedInteger('model_id');
             $table->dateTime('term');
 
             $table->dateTime('window_start')->index();
