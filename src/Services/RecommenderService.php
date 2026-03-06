@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Services;
 
+use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
@@ -232,8 +233,21 @@ class RecommenderService implements RecommenderServiceContract
 
     public function aggregateFrame(AggregatedFrameDto $dto): void
     {
-        $aggregatedFrame = AggregatedFrame::query()->updateOrCreate(['external_id' => $dto->getExternalId()], $dto->toArray());
+        $emotions = collect([
+            EmotionsEnum::ANGRY => $dto->getAvgEmotionsAngry(),
+            EmotionsEnum::DISGUSTED => $dto->getAvgEmotionsDisgusted(),
+            EmotionsEnum::FEARFUL => $dto->getAvgEmotionsFearful(),
+            EmotionsEnum::HAPPY => $dto->getAvgEmotionsHappy(),
+            EmotionsEnum::NEUTRAL => $dto->getAvgEmotionsNeutral(),
+            EmotionsEnum::SAD => $dto->getAvgEmotionsSad(),
+            EmotionsEnum::SURPRISED => $dto->getAvgEmotionsSurprised(),
+        ]);
 
-        AggregatedFrameStored::dispatch($aggregatedFrame);
+        $maxEmotion = $emotions->sortDesc()->keys()->first();
+        $maxEmotionValue = $emotions->get($maxEmotion);
+
+        $aggregatedFrame = AggregatedFrame::query()->updateOrCreate(['external_id' => $dto->getExternalId()], array_merge($dto->toArray(), ['max_emotion' => $maxEmotion, 'max_emotion_value' => $maxEmotionValue]));
+
+        event(new AggregatedFrameStored($aggregatedFrame));
     }
 }
