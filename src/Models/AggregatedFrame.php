@@ -46,6 +46,8 @@ class AggregatedFrame extends Model
         'algorithm',
         'processing_time_ms',
         'external_id',
+        'max_emotion',
+        'max_emotion_value',
     ];
 
     protected $casts = [
