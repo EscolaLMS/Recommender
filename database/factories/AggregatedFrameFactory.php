@@ -12,6 +12,7 @@ class AggregatedFrameFactory extends Factory
     public function definition()
     {
         return [
+            'external_id' => $this->faker->randomNumber(),
             'window_start' => $this->faker->dateTime(),
             'window_end' => $this->faker->dateTime(),
             'count' => $this->faker->numberBetween(1, 100),
