@@ -1,6 +1,6 @@
 <?php
 
-namespace factories;
+namespace EscolaLms\Recommender\Database\Factories;
 
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use Illuminate\Database\Eloquent\Factories\Factory;
