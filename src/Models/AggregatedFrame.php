@@ -2,10 +2,13 @@
 
 namespace EscolaLms\Recommender\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AggregatedFrame extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'model_type',
         'model_id',
