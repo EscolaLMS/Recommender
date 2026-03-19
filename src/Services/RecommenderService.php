@@ -12,7 +12,10 @@ use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 
 class RecommenderService implements RecommenderServiceContract
@@ -231,7 +234,7 @@ class RecommenderService implements RecommenderServiceContract
             ->get('data');
     }
 
-    public function aggregateFrame(AggregatedFrameDto $dto): void
+    public function aggregatedFrameSave(AggregatedFrameDto $dto): void
     {
         $emotions = collect([
             EmotionsEnum::ANGRY => $dto->getAvgEmotionsAngry(),
@@ -249,5 +252,112 @@ class RecommenderService implements RecommenderServiceContract
         $aggregatedFrame = AggregatedFrame::query()->updateOrCreate(['external_id' => $dto->getExternalId()], array_merge($dto->toArray(), ['max_emotion' => $maxEmotion, 'max_emotion_value' => $maxEmotionValue]));
 
         event(new AggregatedFrameStored($aggregatedFrame));
+    }
+
+    public function aggregatedFrames(string $modelType, int $modelId, int $term, int $interval)
+    {
+        $sumColumns = [
+            'sum_attention',
+            'sum_emotions_angry',
+            'sum_emotions_disgusted',
+            'sum_emotions_fearful',
+            'sum_emotions_happy',
+            'sum_emotions_neutral',
+            'sum_emotions_sad',
+            'sum_emotions_surprised',
+        ];
+
+        $selectParts = [];
+
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        if ($pgsql) {
+            $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
+        } else {
+            $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval}) as bucket_start";
+        }
+
+        $selectParts[] = "MAX(window_end) as bucket_end";
+        $selectParts[] = "SUM(count) as total_count";
+
+        foreach ($sumColumns as $sumColumn) {
+            $avgName = Str::replaceFirst('sum_', 'avg_', $sumColumn);
+
+            $selectParts[] = "SUM($sumColumn) as $sumColumn";
+            if ($pgsql) {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count)::numeric, 0) as $avgName";
+            } else {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count), 0) AS $avgName";
+            }
+        }
+
+        $selectRaw = implode(',', $selectParts);
+
+        $term = Carbon::createFromTimestamp($term);
+
+        return AggregatedFrame::query()
+            ->selectRaw($selectRaw)
+            ->where('model_type', $modelType)
+            ->where('model_id', $modelId)
+            ->where('term', $term)
+            ->groupBy('bucket_start')
+            ->orderBy('bucket_start')
+            ->get();
+    }
+
+    public function modelAnalytics(string $modelType, int $modelId, ?int $term = null)
+    {
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
+        if ($pgsql) {
+            $selectRaw = "
+                term,
+
+                SUM(count) as total_count,
+
+                SUM(sum_attention) / NULLIF(SUM(count)::numeric,0) as avg_attention,
+                SUM(sum_emotions_angry) / NULLIF(SUM(count)::numeric,0) as avg_emotions_angry,
+                SUM(sum_emotions_disgusted) / NULLIF(SUM(count)::numeric,0) as avg_emotions_disgusted,
+                SUM(sum_emotions_fearful) / NULLIF(SUM(count)::numeric,0) as avg_emotions_fearful,
+                SUM(sum_emotions_happy) / NULLIF(SUM(count)::numeric,0) as avg_emotions_happy,
+                SUM(sum_emotions_neutral) / NULLIF(SUM(count)::numeric,0) as avg_emotions_neutral,
+                SUM(sum_emotions_sad) / NULLIF(SUM(count)::numeric,0) as avg_emotions_sad,
+                SUM(sum_emotions_surprised) / NULLIF(SUM(count)::numeric,0) as avg_emotions_surprised
+            ";
+        } else {
+            $selectRaw = "
+                term,
+
+                SUM(count) as total_count,
+
+                SUM(sum_attention) / NULLIF(SUM(count), 0) as avg_attention,
+                SUM(sum_emotions_angry) / NULLIF(SUM(count), 0) as avg_emotions_angry,
+                SUM(sum_emotions_disgusted) / NULLIF(SUM(count), 0) as avg_emotions_disgusted,
+                SUM(sum_emotions_fearful) / NULLIF(SUM(count), 0) as avg_emotions_fearful,
+                SUM(sum_emotions_happy) / NULLIF(SUM(count), 0) as avg_emotions_happy,
+                SUM(sum_emotions_neutral) / NULLIF(SUM(count), 0) as avg_emotions_neutral,
+                SUM(sum_emotions_sad) / NULLIF(SUM(count), 0) as avg_emotions_sad,
+                SUM(sum_emotions_surprised) / NULLIF(SUM(count), 0) as avg_emotions_surprised
+            ";
+        }
+
+        $query = AggregatedFrame::query()
+            ->selectRaw($selectRaw)
+            ->where('model_type', $modelType)
+            ->where('model_id', $modelId);
+
+        if ($term) {
+            return $query->where(
+                'term',
+                Carbon::createFromTimestamp($term)
+            )
+                ->groupBy('term')
+                ->orderBy('term')
+                ->first();
+        }
+
+        return $query
+            ->groupBy('term')
+            ->orderBy('term')
+            ->get();
     }
 }

@@ -8,6 +8,9 @@ Route::prefix('api/admin/recommender')
     ->group(function () {
         Route::get('/course/{courseId}', [RecommenderController::class, 'course']);
         Route::get('/lesson/{lessonId}/topic', [RecommenderController::class, 'topic']);
+        Route::get('/aggregated-frames/{modelType}/{modelId}/{term}', [RecommenderController::class, 'aggregateFrames']);
+        Route::get('/analytics/{modelType}/{modelId}', [RecommenderController::class, 'modelAnalytics']);
+        Route::get('/analytics/{modelType}/{modelId}/{term}', [RecommenderController::class, 'modelTermAnalytics']);
     });
 
 Route::prefix('api/recommender')

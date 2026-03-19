@@ -2,10 +2,14 @@
 
 namespace EscolaLms\Recommender\Models;
 
+use EscolaLms\Recommender\Database\Factories\AggregatedFrameFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AggregatedFrame extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'model_type',
         'model_id',
@@ -48,6 +52,7 @@ class AggregatedFrame extends Model
         'external_id',
         'max_emotion',
         'max_emotion_value',
+        'meet_users_count',
     ];
 
     protected $casts = [
@@ -57,4 +62,9 @@ class AggregatedFrame extends Model
         'send_at' => 'datetime',
         'aggregated_at' => 'datetime',
     ];
+
+    protected static function newFactory(): AggregatedFrameFactory
+    {
+        return AggregatedFrameFactory::new();
+    }
 }

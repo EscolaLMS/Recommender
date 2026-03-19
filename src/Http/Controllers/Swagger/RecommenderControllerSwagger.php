@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Recommender\Http\Controllers\Swagger;
 
+use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
+use EscolaLms\Recommender\Http\Requests\AggregatedFrameRequest;
 use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use Illuminate\Http\JsonResponse;
@@ -95,4 +97,195 @@ interface RecommenderControllerSwagger
      * )
      */
     public function topic(TopicRecommendationRequest $request, int $lessonId): JsonResponse;
+
+    public function aggregateFrameSave(AggregatedFrameRequest $request): \Illuminate\Http\Response;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/recommender/aggregated-frames/{modelType}/{modelId}/{term}",
+     *      summary="Aggregated Frames with interval",
+     *      tags={"Admin Recommender"},
+     *      description="Get aggregated frames for model and term with interval",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *     @OA\Parameter(
+     *           name="modelType",
+     *           description="Model type",
+     *           @OA\Schema(
+     *              type="string",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *     @OA\Parameter(
+     *           name="modelId",
+     *           description="ID of model",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *      @OA\Parameter(
+     *          name="term",
+     *          description="Model term",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *     @OA\Parameter(
+     *           name="interval",
+     *           description="Interval",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="query"
+     *       ),
+     *      @OA\Response(
+     *           response=200,
+     *           description="successful operation",
+     *           @OA\MediaType(
+     *               mediaType="application/json"
+     *           ),
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   type="array",
+     *                   @OA\Items(ref="#/components/schemas/AggregatedFrame")
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     * )
+     */
+    public function aggregateFrames(AggregatedFrameListRequest $request, string $modelType, int $modelId, int $term): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/recommender/analytics/{modelType}/{modelId}",
+     *      summary="Model analytics",
+     *      tags={"Admin Recommender"},
+     *      description="Get model analytics",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *     @OA\Parameter(
+     *           name="modelType",
+     *           description="Model type",
+     *           @OA\Schema(
+     *              type="string",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *     @OA\Parameter(
+     *           name="modelId",
+     *           description="ID of model",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *      @OA\Response(
+     *           response=200,
+     *           description="successful operation",
+     *           @OA\MediaType(
+     *               mediaType="application/json"
+     *           ),
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   type="array",
+     *                   @OA\Items(ref="#/components/schemas/AggregatedFrame")
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     * )
+     */
+    public function modelAnalytics(string $modelType, int $modelId): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/recommender/analytics/{modelType}/{modelId}/{term}",
+     *      summary="Model term analytics",
+     *      tags={"Admin Recommender"},
+     *      description="Get Model term analytics",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *     @OA\Parameter(
+     *           name="modelType",
+     *           description="Model type",
+     *           @OA\Schema(
+     *              type="string",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *     @OA\Parameter(
+     *           name="modelId",
+     *           description="ID of model",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *      @OA\Parameter(
+     *          name="term",
+     *          description="Model term",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *           response=200,
+     *           description="successful operation",
+     *           @OA\MediaType(
+     *               mediaType="application/json"
+     *           ),
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   type="array",
+     *                   @OA\Items(ref="#/components/schemas/AggregatedFrame")
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     * )
+     */
+    public function modelTermAnalytics(string $modelType, int $modelId, int $term): JsonResponse;
 }

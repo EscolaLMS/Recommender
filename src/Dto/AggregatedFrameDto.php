@@ -43,6 +43,7 @@ class AggregatedFrameDto extends BaseDto
     protected string $reasoning;
     protected string $algorithm;
     protected int $processingTimeMs;
+    protected int $meetUsersCount;
 
     public function model(): AggregatedFrame
     {
@@ -238,5 +239,14 @@ class AggregatedFrameDto extends BaseDto
     public function getProcessingTimeMs(): int
     {
         return $this->processingTimeMs;
+    }
+
+    public function getMeetUsersCount(): int
+    {
+        return $this->meetUsersCount;
+    }
+    public function setMeetUsersCount(int $meetUsersCount): void
+    {
+        $this->meetUsersCount = $meetUsersCount;
     }
 }
