@@ -225,7 +225,7 @@ class RecommenderControllerTest extends TestCase
             'sum_emotions_neutral' => 0.3,
         ]);
 
-        $response = $this->getJson("/analytics/{$modelType}/{$modelId}");
+        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -261,7 +261,7 @@ class RecommenderControllerTest extends TestCase
 
         $termTimestamp = $term->timestamp;
 
-        $response = $this->getJson("/analytics/{$modelType}/{$modelId}/{$termTimestamp}");
+        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/{$termTimestamp}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
