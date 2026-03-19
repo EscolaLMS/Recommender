@@ -182,14 +182,14 @@ class RecommenderControllerTest extends TestCase
             ]);
         }
 
-        $response = $this->getJson("/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=15");
+        $response = $this->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=15");
 
         $response->assertStatus(200);
         $data = $response->json('data');
 
         $this->assertCount(4, $data);
 
-        $response60 = $this->getJson("/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=60");
+        $response60 = $this->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=60");
         $data60 = $response60->json('data');
 
         $this->assertCount(1, $data60);
