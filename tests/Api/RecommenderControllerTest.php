@@ -232,8 +232,7 @@ class RecommenderControllerTest extends TestCase
                 'data' => [
                     '*' => [
                         'term',
-                        'avg_attention',
-                        'avg_emotions',
+                        'attention',
                         'max_emotion',
                         'max_emotion_percentage',
                     ],
@@ -269,8 +268,7 @@ class RecommenderControllerTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'term',
-                    'avg_attention',
-                    'avg_emotions',
+                    'attention',
                     'max_emotion',
                     'max_emotion_percentage',
                 ],
