@@ -229,14 +229,16 @@ class RecommenderControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                '*' => [
-                    'window_start',
-                    'window_end',
-                    'avg_attention',
-                    'avg_emotions',
-                    'max_emotion',
-                    'max_emotion_percentage',
-                ],
+                'data' => [
+                    '*' => [
+                        'window_start',
+                        'window_end',
+                        'avg_attention',
+                        'avg_emotions',
+                        'max_emotion',
+                        'max_emotion_percentage',
+                    ],
+                ]
             ]);
 
         $json = $response->json('data');
@@ -266,11 +268,13 @@ class RecommenderControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'term',
-                'avg_attention',
-                'avg_emotions',
-                'max_emotion',
-                'max_emotion_percentage',
+                'data' => [
+                    'term',
+                    'avg_attention',
+                    'avg_emotions',
+                    'max_emotion',
+                    'max_emotion_percentage',
+                ],
             ]);
     }
 }
