@@ -230,11 +230,12 @@ class RecommenderControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 '*' => [
-                    'term',
+                    'window_start',
+                    'window_end',
                     'avg_attention',
                     'avg_emotions',
-                    'emotion',
-                    'emotion_percentage',
+                    'max_emotion',
+                    'max_emotion_percentage',
                 ],
             ]);
 
@@ -268,8 +269,8 @@ class RecommenderControllerTest extends TestCase
                 'term',
                 'avg_attention',
                 'avg_emotions',
-                'emotion',
-                'emotion_percentage',
+                'max_emotion',
+                'max_emotion_percentage',
             ]);
     }
 }
