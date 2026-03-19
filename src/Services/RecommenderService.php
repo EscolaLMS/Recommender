@@ -273,7 +273,7 @@ class RecommenderService implements RecommenderServiceContract
         if ($pgsql) {
             $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
         } else {
-            $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval})";
+            $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval}) as bucket_start";
         }
 
         $selectParts[] = "MAX(window_end) as bucket_end";
