@@ -346,10 +346,13 @@ class RecommenderService implements RecommenderServiceContract
             ->where('model_id', $modelId);
 
         if ($term) {
-            $query->where(
+            return $query->where(
                 'term',
                 Carbon::createFromTimestamp($term)
-            );
+            )
+                ->groupBy('term')
+                ->orderBy('term')
+                ->first();
         }
 
         return $query
