@@ -43,6 +43,7 @@ class AggregatedFrameStored implements ShouldBroadcast
             'attention' => $this->aggregatedFrame->avg_attention,
             'emotion' => $this->aggregatedFrame->max_emotion,
             'emotion_percentage' => $this->aggregatedFrame->max_emotion_value,
+            'meet_users_count' => $this->aggregatedFrame->meet_users_count,
         ];
     }
 

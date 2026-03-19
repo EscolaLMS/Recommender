@@ -48,6 +48,7 @@ class AggregatedFrame extends Model
         'external_id',
         'max_emotion',
         'max_emotion_value',
+        'meet_users_count',
     ];
 
     protected $casts = [
