@@ -168,6 +168,8 @@ class RecommenderControllerTest extends TestCase
         $term = Carbon::now();
         $interval = 15;
 
+        $admin = $this->makeAdmin();
+
         foreach (range(0, 3) as $i) {
             AggregatedFrame::factory()->create([
                 'model_type' => $modelType,
@@ -182,14 +184,14 @@ class RecommenderControllerTest extends TestCase
             ]);
         }
 
-        $response = $this->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=15");
+        $response = $this->actingAs($admin)->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=15");
 
         $response->assertStatus(200);
         $data = $response->json('data');
 
         $this->assertCount(4, $data);
 
-        $response60 = $this->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=60");
+        $response60 = $this->actingAs($admin)->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=60");
         $data60 = $response60->json('data');
 
         $this->assertCount(1, $data60);
