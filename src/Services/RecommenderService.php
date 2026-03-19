@@ -269,8 +269,8 @@ class RecommenderService implements RecommenderServiceContract
 
         $selectParts = [];
 
-        $driver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
-        if ($driver === 'pgsql') {
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        if ($pgsql) {
             $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
         } else {
             $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval})";
@@ -283,7 +283,7 @@ class RecommenderService implements RecommenderServiceContract
             $avgName = Str::replaceFirst('sum_', 'avg_', $sumColumn);
 
             $selectParts[] = "SUM($sumColumn) as $sumColumn";
-            if ($driver === 'pgsql') {
+            if ($pgsql) {
                 $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count)::numeric, 0) as $avgName";
             } else {
                 $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count), 0) AS $avgName";
@@ -306,9 +306,9 @@ class RecommenderService implements RecommenderServiceContract
 
     public function modelAnalytics(string $modelType, int $modelId, ?int $term = null)
     {
-        $driver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
 
-        if ($driver === 'pgsql') {
+        if ($pgsql) {
             $selectRaw = "
                 term,
 
