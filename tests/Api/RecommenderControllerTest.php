@@ -165,7 +165,7 @@ class RecommenderControllerTest extends TestCase
     {
         $modelType = 'consultation';
         $modelId = 1;
-        $term = Carbon::now();
+        $term = Carbon::createFromTimestamp('1770628500');
         $interval = 15;
 
         $admin = $this->makeAdmin();
