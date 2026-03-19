@@ -13,6 +13,7 @@ use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -267,7 +268,14 @@ class RecommenderService implements RecommenderServiceContract
         ];
 
         $selectParts = [];
-        $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
+
+        $driver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        if ($driver === 'pgsql') {
+            $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
+        } else {
+            $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval})";
+        }
+
         $selectParts[] = "MAX(window_end) as bucket_end";
         $selectParts[] = "SUM(count) as total_count";
 
@@ -275,7 +283,11 @@ class RecommenderService implements RecommenderServiceContract
             $avgName = Str::replaceFirst('sum_', 'avg_', $sumColumn);
 
             $selectParts[] = "SUM($sumColumn) as $sumColumn";
-            $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count)::numeric, 0) as $avgName";
+            if ($driver === 'pgsql') {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count)::numeric, 0) as $avgName";
+            } else {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count), 0) AS $avgName";
+            }
         }
 
         $selectRaw = implode(',', $selectParts);
@@ -294,14 +306,15 @@ class RecommenderService implements RecommenderServiceContract
 
     public function modelAnalytics(string $modelType, int $modelId, ?int $term = null)
     {
-        $query = AggregatedFrame::query()
-            ->selectRaw("
+        $driver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
+        if ($driver === 'pgsql') {
+            $selectRaw = "
                 term,
 
                 SUM(count) as total_count,
 
                 SUM(sum_attention) / NULLIF(SUM(count)::numeric,0) as avg_attention,
-
                 SUM(sum_emotions_angry) / NULLIF(SUM(count)::numeric,0) as avg_emotions_angry,
                 SUM(sum_emotions_disgusted) / NULLIF(SUM(count)::numeric,0) as avg_emotions_disgusted,
                 SUM(sum_emotions_fearful) / NULLIF(SUM(count)::numeric,0) as avg_emotions_fearful,
@@ -309,7 +322,26 @@ class RecommenderService implements RecommenderServiceContract
                 SUM(sum_emotions_neutral) / NULLIF(SUM(count)::numeric,0) as avg_emotions_neutral,
                 SUM(sum_emotions_sad) / NULLIF(SUM(count)::numeric,0) as avg_emotions_sad,
                 SUM(sum_emotions_surprised) / NULLIF(SUM(count)::numeric,0) as avg_emotions_surprised
-            ")
+            ";
+        } else {
+            $selectRaw = "
+                term,
+
+                SUM(count) as total_count,
+
+                SUM(sum_attention) / NULLIF(SUM(count), 0) as avg_attention,
+                SUM(sum_emotions_angry) / NULLIF(SUM(count), 0) as avg_emotions_angry,
+                SUM(sum_emotions_disgusted) / NULLIF(SUM(count), 0) as avg_emotions_disgusted,
+                SUM(sum_emotions_fearful) / NULLIF(SUM(count), 0) as avg_emotions_fearful,
+                SUM(sum_emotions_happy) / NULLIF(SUM(count), 0) as avg_emotions_happy,
+                SUM(sum_emotions_neutral) / NULLIF(SUM(count), 0) as avg_emotions_neutral,
+                SUM(sum_emotions_sad) / NULLIF(SUM(count), 0) as avg_emotions_sad,
+                SUM(sum_emotions_surprised) / NULLIF(SUM(count), 0) as avg_emotions_surprised
+            ";
+        }
+
+        $query = AggregatedFrame::query()
+            ->selectRaw($selectRaw)
             ->where('model_type', $modelType)
             ->where('model_id', $modelId);
 
