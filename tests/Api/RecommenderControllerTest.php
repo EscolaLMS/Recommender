@@ -231,8 +231,7 @@ class RecommenderControllerTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     '*' => [
-                        'window_start',
-                        'window_end',
+                        'term',
                         'avg_attention',
                         'avg_emotions',
                         'max_emotion',

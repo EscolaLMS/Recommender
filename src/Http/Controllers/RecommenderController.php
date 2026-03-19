@@ -72,6 +72,6 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
     {
         $data = $this->recommenderService->modelAnalytics($modelType, $modelId, $term);
 
-        return $this->sendResponseForResource(ModelAnalyticsResource::collection($data), __('Term analytics retrieved successfully'));
+        return $this->sendResponseForResource(ModelAnalyticsResource::make($data), __('Term analytics retrieved successfully'));
     }
 }
