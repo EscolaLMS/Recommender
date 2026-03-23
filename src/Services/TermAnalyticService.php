@@ -74,8 +74,8 @@ class TermAnalyticService implements TermAnalyticServiceContract
             $termAnalytic->sum_emotions_surprised = 0;
         }
 
-        $termAnalytic->count = $data->count;
-        $termAnalytic->aggregated_frames_count = $data->aggregated_frames_count;
+        $termAnalytic->count += $data->count;
+        $termAnalytic->aggregated_frames_count += $data->aggregated_frames_count;
         $termAnalytic->sum_attention += $data->sum_attention;
         $termAnalytic->sum_emotions_angry += $data->sum_emotions_angry;
         $termAnalytic->sum_emotions_disgusted += $data->sum_emotions_disgusted;
