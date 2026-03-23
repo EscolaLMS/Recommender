@@ -79,7 +79,7 @@ class TermAnalyticTest extends TestCase
     public function testRebuildTermAnalyticExisting(): void
     {
         $modelType = 'consultation';
-        $modelId = 1;
+        $modelId = 2137;
         $term = Carbon::now();
 
         $termAnalytic = TermAnalytic::factory()->create([

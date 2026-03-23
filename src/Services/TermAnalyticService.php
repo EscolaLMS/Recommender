@@ -23,7 +23,10 @@ class TermAnalyticService implements TermAnalyticServiceContract
 
     public function rebuildTermAnalytic(string $modelType, int $modelId, Carbon $term): void
     {
-        $termAnalytic = TermAnalytic::query()->where('model_type', $modelType)->where('model_id', $modelId)->where('term', $term)->first();
+        $termAnalytic = TermAnalytic::query()->where('model_type', $modelType)
+            ->where('model_id', $modelId)
+            ->where('term', $term)
+            ->first();
         $query = AggregatedFrame::query()->where('model_type', $modelType)->where('model_id', $modelId)->where('term', $term)->whereNull('term_analytic_id');
 
         $framesQuery = AggregatedFrame::query()
