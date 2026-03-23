@@ -68,10 +68,10 @@ class TermAnalyticTest extends TestCase
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
-            'sum_attention' => 1,
+            'sum_attention' => '1.0000000000000000000000000',
             'count' => 1,
-            'sum_emotions_happy' => 0.6,
-            'sum_emotions_sad' => 0.4,
+            'sum_emotions_happy' => '0.6000000000000000000000000',
+            'sum_emotions_sad' => '0.4000000000000000000000000',
             'aggregated_frames_count' => 1,
         ]);
     }
@@ -121,10 +121,10 @@ class TermAnalyticTest extends TestCase
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
-            'sum_attention' => 2,
             'count' => 2,
-            'sum_emotions_happy' => 1.1,
-            'sum_emotions_sad' => 0.9,
+            'sum_attention' => '2.0000000000000000000000000',
+            'sum_emotions_happy' => '1.1000000000000000000000000',
+            'sum_emotions_sad' => '0.9000000000000000000000000',
             'aggregated_frames_count' => 2,
         ]);
     }
