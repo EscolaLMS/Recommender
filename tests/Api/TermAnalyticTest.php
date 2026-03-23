@@ -7,6 +7,7 @@ use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Jobs\RebuildTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\TermAnalytic;
+use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -62,7 +63,9 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_sad' => 0.4,
         ]);
 
-        dispatch_sync(new RebuildTermAnalyticJob());
+        $job = new RebuildTermAnalyticJob();
+        $service = app(TermAnalyticServiceContract::class);
+        $job->handle($service);
 
         $this->assertDatabaseHas('term_analytics', [
             'model_type' => $modelType,
@@ -114,7 +117,9 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_sad' => 0.5,
         ]);
 
-        dispatch_sync(new RebuildTermAnalyticJob());
+        $job = new RebuildTermAnalyticJob();
+        $service = app(TermAnalyticServiceContract::class);
+        $job->handle($service);
 
         $this->assertDatabaseHas('term_analytics', [
             'id' => $termAnalytic->getKey(),
