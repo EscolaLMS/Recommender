@@ -90,6 +90,7 @@ class TermAnalyticTest extends TestCase
             'count' => 1,
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
+            'aggregated_frames_count' => 1,
         ]);
 
         $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
