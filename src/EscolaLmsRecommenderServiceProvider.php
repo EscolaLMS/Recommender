@@ -7,10 +7,14 @@ use EscolaLms\Recommender\Http\Middleware\VerifySignature;
 use EscolaLms\Recommender\Providers\AuthServiceProvider;
 use EscolaLms\Recommender\Providers\EventServiceProvider;
 use EscolaLms\Recommender\Providers\SettingsServiceProvider;
+use EscolaLms\Recommender\Repositories\Contracts\TermAnalyticsRepositoryContract;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
+use EscolaLms\Recommender\Repositories\TermAnalyticsRepository;
 use EscolaLms\Recommender\Repositories\TopicRepository;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
+use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use EscolaLms\Recommender\Services\RecommenderService;
+use EscolaLms\Recommender\Services\TermAnalyticService;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
@@ -23,11 +27,13 @@ class EscolaLmsRecommenderServiceProvider extends ServiceProvider
     const CONFIG_KEY = 'escolalms_recommender';
 
     public const REPOSITORIES = [
-        TopicRepositoryContract::class => TopicRepository::class
+        TopicRepositoryContract::class => TopicRepository::class,
+        TermAnalyticsRepositoryContract::class => TermAnalyticsRepository::class,
     ];
 
     public const SERVICES = [
-        RecommenderServiceContract::class => RecommenderService::class
+        RecommenderServiceContract::class => RecommenderService::class,
+        TermAnalyticServiceContract::class => TermAnalyticService::class,
     ];
 
     public $singletons = self::SERVICES + self::REPOSITORIES;

@@ -1,6 +1,7 @@
 <?php
 
 use EscolaLms\Recommender\Http\Controllers\RecommenderController;
+use EscolaLms\Recommender\Http\Controllers\TermAnalyticController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/admin/recommender')
@@ -11,6 +12,7 @@ Route::prefix('api/admin/recommender')
         Route::get('/aggregated-frames/{modelType}/{modelId}/{term}', [RecommenderController::class, 'aggregateFrames']);
         Route::get('/analytics/{modelType}/{modelId}', [RecommenderController::class, 'modelAnalytics']);
         Route::get('/analytics/{modelType}/{modelId}/{term}', [RecommenderController::class, 'modelTermAnalytics']);
+        Route::get('/terms/{modelType}', [TermAnalyticController::class, 'index']);
     });
 
 Route::prefix('api/recommender')

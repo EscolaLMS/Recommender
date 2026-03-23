@@ -60,18 +60,4 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
 
         return $this->sendResponseForResource(AggregatedFrameResource::collection($data), __('Aggregated Frames retrieved successfully'));
     }
-
-    public function modelAnalytics(string $modelType, int $modelId): JsonResponse
-    {
-        $data = $this->recommenderService->modelAnalytics($modelType, $modelId);
-
-        return $this->sendResponseForResource(ModelAnalyticsResource::collection($data), __('Model analytics retrieved successfully'));
-    }
-
-    public function modelTermAnalytics(string $modelType, int $modelId, int $term): JsonResponse
-    {
-        $data = $this->recommenderService->modelAnalytics($modelType, $modelId, $term);
-
-        return $this->sendResponseForResource(ModelAnalyticsResource::make($data), __('Term analytics retrieved successfully'));
-    }
 }
