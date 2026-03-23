@@ -53,7 +53,7 @@ class TermAnalyticTest extends TestCase
         $modelId = 37;
         $term = Carbon::now();
 
-        $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
+        $aggregatedFrame = AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
@@ -96,7 +96,7 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
         ]);
 
-        $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
+        $aggregatedFrame = AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
@@ -107,7 +107,7 @@ class TermAnalyticTest extends TestCase
             'term_analytic_id' => $termAnalytic->getKey(),
         ]);
 
-        $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
+        $aggregatedFrame = AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
@@ -123,7 +123,7 @@ class TermAnalyticTest extends TestCase
 
         sleep(1);
 
-        $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
+        $aggregatedFrame = AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
