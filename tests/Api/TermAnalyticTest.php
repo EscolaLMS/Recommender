@@ -111,7 +111,6 @@ class TermAnalyticTest extends TestCase
             'count' => 1,
             'sum_emotions_happy' => 0.5,
             'sum_emotions_sad' => 0.5,
-            'term_analytic_id' => $termAnalytic->getKey(),
         ]);
 
         dispatch_sync(new RebuildTermAnalyticJob());
