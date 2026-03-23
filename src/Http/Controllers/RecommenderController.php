@@ -10,7 +10,6 @@ use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
 use EscolaLms\Recommender\Http\Resources\CourseRecommendationResource;
-use EscolaLms\Recommender\Http\Resources\ModelAnalyticsResource;
 use EscolaLms\Recommender\Http\Resources\TopicRecommendationResource;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
