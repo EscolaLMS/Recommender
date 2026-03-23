@@ -27,10 +27,7 @@ class TermAnalyticService implements TermAnalyticServiceContract
             ->where('model_id', $modelId)
             ->where('term', $term)
             ->first();
-        $query = AggregatedFrame::query()->where('model_type', $modelType)->where('model_id', $modelId)->where('term', $term)->whereNull('term_analytic_id');
-
-        $framesQuery = AggregatedFrame::query()
-            ->whereNull('term_analytic_id')
+        $query = AggregatedFrame::query()
             ->where('model_type', $modelType)
             ->where('model_id', $modelId)
             ->where('term', $term);
@@ -62,28 +59,18 @@ class TermAnalyticService implements TermAnalyticServiceContract
             $termAnalytic->model_type = $modelType;
             $termAnalytic->model_id = $modelId;
             $termAnalytic->term = $term;
-            $termAnalytic->count = 0;
-            $termAnalytic->aggregated_frames_count = 0;
-            $termAnalytic->sum_attention = 0;
-            $termAnalytic->sum_emotions_angry = 0;
-            $termAnalytic->sum_emotions_disgusted = 0;
-            $termAnalytic->sum_emotions_fearful = 0;
-            $termAnalytic->sum_emotions_happy = 0;
-            $termAnalytic->sum_emotions_neutral = 0;
-            $termAnalytic->sum_emotions_sad = 0;
-            $termAnalytic->sum_emotions_surprised = 0;
         }
 
-        $termAnalytic->count += $data->count;
-        $termAnalytic->aggregated_frames_count += $data->aggregated_frames_count;
-        $termAnalytic->sum_attention += $data->sum_attention;
-        $termAnalytic->sum_emotions_angry += $data->sum_emotions_angry;
-        $termAnalytic->sum_emotions_disgusted += $data->sum_emotions_disgusted;
-        $termAnalytic->sum_emotions_fearful += $data->sum_emotions_fearful;
-        $termAnalytic->sum_emotions_happy += $data->sum_emotions_happy;
-        $termAnalytic->sum_emotions_neutral += $data->sum_emotions_neutral;
-        $termAnalytic->sum_emotions_sad += $data->sum_emotions_sad;
-        $termAnalytic->sum_emotions_surprised += $data->sum_emotions_surprised;
+        $termAnalytic->count = $data->count;
+        $termAnalytic->aggregated_frames_count = $data->aggregated_frames_count;
+        $termAnalytic->sum_attention = $data->sum_attention;
+        $termAnalytic->sum_emotions_angry = $data->sum_emotions_angry;
+        $termAnalytic->sum_emotions_disgusted = $data->sum_emotions_disgusted;
+        $termAnalytic->sum_emotions_fearful = $data->sum_emotions_fearful;
+        $termAnalytic->sum_emotions_happy = $data->sum_emotions_happy;
+        $termAnalytic->sum_emotions_neutral = $data->sum_emotions_neutral;
+        $termAnalytic->sum_emotions_sad = $data->sum_emotions_sad;
+        $termAnalytic->sum_emotions_surprised = $data->sum_emotions_surprised;
         $termAnalytic->last_frame_at = $data->last_frame_at;
         $termAnalytic->avg_attention = $termAnalytic->sum_attention / $termAnalytic->count;
         $termAnalytic->avg_emotions_angry = $termAnalytic->sum_emotions_angry / $termAnalytic->count;
@@ -96,7 +83,7 @@ class TermAnalyticService implements TermAnalyticServiceContract
 
         $emotions = collect([
             EmotionsEnum::ANGRY => $termAnalytic->avg_emotions_angry,
-            EmotionsEnum::DISGUSTED => $termAnalytic->avg_emotions_,
+            EmotionsEnum::DISGUSTED => $termAnalytic->avg_emotions_disgusted,
             EmotionsEnum::FEARFUL => $termAnalytic->avg_emotions_fearful,
             EmotionsEnum::HAPPY => $termAnalytic->avg_emotions_happy,
             EmotionsEnum::NEUTRAL => $termAnalytic->avg_emotions_neutral,
@@ -112,9 +99,14 @@ class TermAnalyticService implements TermAnalyticServiceContract
 
         $termAnalytic->save();
 
-        $framesQuery->update([
-            'term_analytic_id' => $termAnalytic->getKey(),
-        ]);
+        AggregatedFrame::query()
+            ->where('model_type', $modelType)
+            ->where('model_id', $modelId)
+            ->where('term', $term)
+            ->whereNull('term_analytic_id')
+            ->update([
+                'term_analytic_id' => $termAnalytic->getKey(),
+            ]);
     }
 
     public function termAnalyticsList(string $modelType, TermAnalyticsFilterListDto $criteriaDto, PageDto $pageDto, OrderDto $orderDto): LengthAwarePaginator
