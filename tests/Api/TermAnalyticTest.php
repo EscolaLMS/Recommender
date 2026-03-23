@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
+use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Jobs\RebuildTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
@@ -15,10 +16,17 @@ class TermAnalyticTest extends TestCase
 {
     use CreatesCourse, CreatesUsers, WithFaker;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(ConsultationsPermissionSeeder::class);
+    }
+
     public function testTermAnalyticList(): void
     {
         $modelType = 'consultation';
-        $modelId = 1;
+        $modelId = 21;
         $term = Carbon::now();
 
         TermAnalytic::factory()->create([
@@ -41,7 +49,7 @@ class TermAnalyticTest extends TestCase
     public function testRebuildTermAnalytic(): void
     {
         $modelType = 'consultation';
-        $modelId = 1;
+        $modelId = 37;
         $term = Carbon::now();
 
         $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
