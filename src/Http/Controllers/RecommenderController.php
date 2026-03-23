@@ -10,7 +10,6 @@ use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
 use EscolaLms\Recommender\Http\Resources\CourseRecommendationResource;
-use EscolaLms\Recommender\Http\Resources\ModelAnalyticsResource;
 use EscolaLms\Recommender\Http\Resources\TopicRecommendationResource;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
@@ -59,19 +58,5 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
         $data = $this->recommenderService->aggregatedFrames($modelType, $modelId, $term, $request->get('interval'));
 
         return $this->sendResponseForResource(AggregatedFrameResource::collection($data), __('Aggregated Frames retrieved successfully'));
-    }
-
-    public function modelAnalytics(string $modelType, int $modelId): JsonResponse
-    {
-        $data = $this->recommenderService->modelAnalytics($modelType, $modelId);
-
-        return $this->sendResponseForResource(ModelAnalyticsResource::collection($data), __('Model analytics retrieved successfully'));
-    }
-
-    public function modelTermAnalytics(string $modelType, int $modelId, int $term): JsonResponse
-    {
-        $data = $this->recommenderService->modelAnalytics($modelType, $modelId, $term);
-
-        return $this->sendResponseForResource(ModelAnalyticsResource::make($data), __('Term analytics retrieved successfully'));
     }
 }

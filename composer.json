@@ -9,6 +9,8 @@
     "escolalms/courses": "^0.4",
     "escolalms/topic-types": "^0",
     "escolalms/settings": "^0",
+    "escolalms/consultations": "^0",
+    "escolalms/webinar": "^0",
     "laravel/framework": ">=8.0"
   },
   "require-dev": {
@@ -42,7 +44,10 @@
   "config": {
     "optimize-autoloader": false,
     "preferred-install": "dist",
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true

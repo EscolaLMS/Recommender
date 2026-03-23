@@ -2,12 +2,11 @@
 
 namespace EscolaLms\Recommender\Http\Resources;
 
-use EscolaLms\Recommender\Enum\EmotionsEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @OA\Schema(
- *      schema="ModelAnalytics",
+ *      schema="TermAnalytic",
  *      @OA\Property(
  *          property="term",
  *          description="term",
@@ -63,36 +62,43 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *            description="avg_surprised",
  *            type="numeric",
  *        ),
+ *     @OA\Property(
+ *             property="model_id",
+ *             description="model_id",
+ *             type="numeric",
+ *         ),
+ *     @OA\Property(
+ *             property="model_type",
+ *             description="model_type",
+ *             type="string",
+ *         ),
+ *     @OA\Property(
+ *             property="model_name",
+ *             description="model_name",
+ *             type="string",
+ *         ),
  * )
  */
-class ModelAnalyticsResource extends JsonResource
+class TermAnalyticResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $emotions = [
-            EmotionsEnum::ANGRY => $this->resource->avg_emotions_angry,
-            EmotionsEnum::DISGUSTED => $this->resource->avg_emotions_disgusted,
-            EmotionsEnum::FEARFUL => $this->resource->avg_emotions_fearful,
-            EmotionsEnum::HAPPY => $this->resource->avg_emotions_happy,
-            EmotionsEnum::NEUTRAL => $this->resource->avg_emotions_neutral,
-            EmotionsEnum::SAD => $this->resource->avg_emotions_sad,
-            EmotionsEnum::SURPRISED => $this->resource->avg_emotions_surprised,
-        ];
-
-        $maxEmotion = null;
-        $maxValue = -1;
-        foreach ($emotions as $emotion => $value) {
-            if ($value > $maxValue) {
-                $maxValue = $value;
-                $maxEmotion = $emotion;
-            }
-        }
-
-        return array_merge([
-            'attention' => $this->resource->avg_attention,
-            'max_emotion' => $maxEmotion,
-            'max_emotion_percentage' => $maxValue,
+        return [
+            'id' => $this->resource->getKey(),
             'term' => $this->resource->term,
-        ], $emotions);
+            'model_id' => $this->resource->model_id,
+            'model_type' => $this->resource->model_type,
+            'model_name' => $this->resource->model_name,
+            'avg_attention' => $this->resource->avg_attention,
+            'avg_emotions_angry' => $this->resource->avg_emotions_angry,
+            'avg_emotions_disgusted' => $this->resource->avg_emotions_disgusted,
+            'avg_emotions_fearful' => $this->resource->avg_emotions_fearful,
+            'avg_emotions_happy' => $this->resource->avg_emotions_happy,
+            'avg_emotions_neutral' => $this->resource->avg_emotions_neutral,
+            'avg_emotions_sad' => $this->resource->avg_emotions_sad,
+            'avg_emotions_surprised' => $this->resource->avg_emotions_surprised,
+            'max_emotion' => $this->resource->max_emotion,
+            'max_emotion_value' => $this->resource->max_emotion_value,
+        ];
     }
 }

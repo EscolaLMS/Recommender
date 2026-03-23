@@ -53,6 +53,7 @@ class AggregatedFrame extends Model
         'max_emotion',
         'max_emotion_value',
         'meet_users_count',
+        'term_analytic_id',
     ];
 
     protected $casts = [

@@ -16,5 +16,4 @@ interface RecommenderServiceContract
 
     public function aggregatedFrameSave(AggregatedFrameDto $dto): void;
     public function aggregatedFrames(string $modelType, int $modelId, int $term, int $interval);
-    public function modelAnalytics(string $modelType, int $modelId, ?int $term = null);
 }

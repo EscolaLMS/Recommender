@@ -197,7 +197,7 @@ class RecommenderControllerTest extends TestCase
         $this->assertCount(1, $data60);
     }
 
-    public function testModelAnalyticsReturnsAllTerms()
+    public function testModelAnalyticsReturnsAllTerms(): void
     {
         $modelType = 'consultation';
         $modelId = 1;
@@ -244,7 +244,7 @@ class RecommenderControllerTest extends TestCase
         $this->assertCount(2, $json);
     }
 
-    public function testModelTermAnalyticsReturnsSingleTerm()
+    public function testModelTermAnalyticsReturnsSingleTerm(): void
     {
         $modelType = 'consultation';
         $modelId = 1;
