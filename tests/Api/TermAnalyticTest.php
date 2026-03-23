@@ -121,16 +121,30 @@ class TermAnalyticTest extends TestCase
         $service = app(TermAnalyticServiceContract::class);
         $job->handle($service);
 
+        $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 3,
+            'sum_emotions_happy' => 0.5,
+            'sum_emotions_sad' => 0.5,
+        ]);
+
+        $job = new RebuildTermAnalyticJob();
+        $service = app(TermAnalyticServiceContract::class);
+        $job->handle($service);
+
         $this->assertDatabaseHas('term_analytics', [
             'id' => $termAnalytic->getKey(),
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
-            'count' => 2,
-            'sum_attention' => '2.0000000000000000000000000',
-            'sum_emotions_happy' => '1.1000000000000000000000000',
-            'sum_emotions_sad' => '0.9000000000000000000000000',
-            'aggregated_frames_count' => 2,
+            'count' => 5,
+            'sum_attention' => '3.0000000000000000000000000',
+            'sum_emotions_happy' => '1.6000000000000000000000000',
+            'sum_emotions_sad' => '1.4000000000000000000000000',
+            'aggregated_frames_count' => 3,
         ]);
     }
 }
