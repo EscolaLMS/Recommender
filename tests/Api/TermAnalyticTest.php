@@ -121,6 +121,8 @@ class TermAnalyticTest extends TestCase
         $service = app(TermAnalyticServiceContract::class);
         $job->handle($service);
 
+        sleep(1);
+
         $aggregatedFrame = AggregatedFrame::factory()->count(5)->create([
             'model_type' => $modelType,
             'model_id' => $modelId,

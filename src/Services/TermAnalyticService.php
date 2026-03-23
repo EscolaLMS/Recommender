@@ -35,7 +35,7 @@ class TermAnalyticService implements TermAnalyticServiceContract
         $data = $query
             ->selectRaw("
                 SUM(count) as count,
-                COUNT(*) as aggregated_frames_count,
+                COUNT(id) as aggregated_frames_count,
                 MAX(updated_at) as last_frame_at,
 
                 SUM(sum_attention) as sum_attention,
