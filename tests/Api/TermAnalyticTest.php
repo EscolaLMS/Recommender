@@ -33,7 +33,7 @@ class TermAnalyticTest extends TestCase
         ]);
 
         $this
-//            ->actingAs($this->makeAdmin(), 'api')
+            ->actingAs($this->makeAdmin(), 'api')
             ->getJson("api/admin/recommender/terms/{$modelType}")
             ->assertOk();
     }
