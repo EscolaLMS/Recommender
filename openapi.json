@@ -192,7 +192,7 @@
                         }
                     },
                     {
-                        "name": "term_from",
+                        "name": "date_from",
                         "in": "query",
                         "description": "Term date from",
                         "required": false,
@@ -201,12 +201,48 @@
                         }
                     },
                     {
-                        "name": "term_to",
+                        "name": "date_to",
                         "in": "query",
                         "description": "Term date to",
                         "required": false,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Order by: id, name, term",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "asc or desc",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Elements per page",
+                        "required": false,
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page",
+                        "required": false,
+                        "schema": {
+                            "type": "int"
                         }
                     }
                 ],
@@ -298,7 +334,7 @@
                     {
                         "name": "term",
                         "in": "path",
-                        "description": "Model term",
+                        "description": "Model term id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -481,6 +517,10 @@
                     },
                     "model_name": {
                         "description": "model_name",
+                        "type": "string"
+                    },
+                    "rating": {
+                        "description": "Model term users rating",
                         "type": "string"
                     }
                 },
