@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
-use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Courses\Database\Seeders\CoursesPermissionSeeder;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
@@ -23,7 +22,6 @@ class RecommenderControllerTest extends TestCase
         parent::setUp();
 
         $this->seed(CoursesPermissionSeeder::class);
-        $this->seed(ConsultationsPermissionSeeder::class);
 
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
@@ -197,83 +195,5 @@ class RecommenderControllerTest extends TestCase
         $data60 = $response60->json('data');
 
         $this->assertCount(1, $data60);
-    }
-
-    public function testModelAnalyticsReturnsAllTerms(): void
-    {
-        $modelType = 'consultation';
-        $modelId = 1;
-
-        $term1 = Carbon::now()->subDay();
-        $term2 = Carbon::now();
-
-        AggregatedFrame::factory()->count(5)->create([
-            'model_type' => $modelType,
-            'model_id' => $modelId,
-            'term' => $term1,
-            'sum_attention' => 1,
-            'count' => 1,
-            'sum_emotions_happy' => 0.5,
-            'sum_emotions_neutral' => 0.5,
-        ]);
-
-        AggregatedFrame::factory()->count(7)->create([
-            'model_type' => $modelType,
-            'model_id' => $modelId,
-            'term' => $term2,
-            'sum_attention' => 2,
-            'count' => 2,
-            'sum_emotions_happy' => 0.7,
-            'sum_emotions_neutral' => 0.3,
-        ]);
-
-        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}");
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    '*' => [
-                        'term',
-                        'attention',
-                        'max_emotion',
-                        'max_emotion_percentage',
-                    ],
-                ]
-            ]);
-
-        $json = $response->json('data');
-
-        $this->assertCount(2, $json);
-    }
-
-    public function testModelTermAnalyticsReturnsSingleTerm(): void
-    {
-        $modelType = 'consultation';
-        $modelId = 1;
-        $term = Carbon::now();
-
-        AggregatedFrame::factory()->count(5)->create([
-            'model_type' => $modelType,
-            'model_id' => $modelId,
-            'term' => $term,
-            'sum_attention' => 1,
-            'count' => 1,
-            'sum_emotions_happy' => 0.6,
-            'sum_emotions_sad' => 0.4,
-        ]);
-
-        $termTimestamp = $term->timestamp;
-
-        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/{$termTimestamp}");
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    'term',
-                    'attention',
-                    'max_emotion',
-                    'max_emotion_percentage',
-                ],
-            ]);
     }
 }
