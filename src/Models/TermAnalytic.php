@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Recommender\Models;
 
-use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Recommender\Database\Factories\TermAnalyticFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,11 +45,5 @@ class TermAnalytic extends Model
     protected static function newFactory(): TermAnalyticFactory
     {
         return TermAnalyticFactory::new();
-    }
-
-    public function consultation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Consultation::class, 'model_id')
-            ->where('model_type', 'consultation');
     }
 }
