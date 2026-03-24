@@ -15,4 +15,5 @@ interface TermAnalyticServiceContract
     public function rebuildTermAnalytic(string $modelType, int $modelId, Carbon $term): void;
     public function termAnalyticsList(string $modelType, TermAnalyticsFilterListDto $criteriaDto, PageDto $pageDto, OrderDto $orderDto): LengthAwarePaginator;
     public function modelAnalytics(string $modelType, int $modelId, ?int $term = null): Collection|AggregatedFrame;
+    public function modelAnalyticsForTerm(int $termAnalyticId): AggregatedFrame;
 }

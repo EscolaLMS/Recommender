@@ -5,6 +5,7 @@ namespace EscolaLms\Recommender\Http\Controllers;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Recommender\Http\Controllers\Swagger\TermAnalyticControllerContract;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticListRequest;
+use EscolaLms\Recommender\Http\Requests\TermAnalyticRequest;
 use EscolaLms\Recommender\Http\Resources\ModelAnalyticsResource;
 use EscolaLms\Recommender\Http\Resources\TermAnalyticResource;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
@@ -32,9 +33,9 @@ class TermAnalyticController extends EscolaLmsBaseController implements TermAnal
         return $this->sendResponseForResource(ModelAnalyticsResource::collection($data), __('Model analytics retrieved successfully'));
     }
 
-    public function modelTermAnalytics(string $modelType, int $modelId, int $term): JsonResponse
+    public function modelTermAnalytics(TermAnalyticRequest $request, string $modelType, int $modelId, int $term): JsonResponse
     {
-        $data = $this->termAnalyticService->modelAnalytics($modelType, $modelId, $term);
+        $data = $this->termAnalyticService->modelAnalyticsForTerm($term);
 
         return $this->sendResponseForResource(ModelAnalyticsResource::make($data), __('Term analytics retrieved successfully'));
     }

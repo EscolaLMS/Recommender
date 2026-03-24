@@ -2,13 +2,13 @@
 
 namespace EscolaLms\Recommender\Dto;
 
-use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Core\Dtos\Contracts\DtoContract;
 use EscolaLms\Core\Dtos\Contracts\InstantiateFromRequest;
 use EscolaLms\Core\Dtos\CriteriaDto as BaseCriteriaDto;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\LikeCriterion;
+use EscolaLms\Recommender\Repositories\Criteria\CategoriesCriterion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -22,12 +22,12 @@ class TermAnalyticsFilterListDto extends BaseCriteriaDto implements DtoContract,
             $criteria->push(new LikeCriterion('m.name', $request->get('name')));
         }
 
-        if ($request->get('term_from')) {
-            $criteria->push(new DateCriterion('ta.term', $request->get('term_from'), '>='));
+        if ($request->get('date_from')) {
+            $criteria->push(new DateCriterion('ta.term', $request->get('date_from'), '>='));
         }
 
-        if ($request->get('term_to')) {
-            $criteria->push(new DateCriterion('ta.term', $request->get('term_to'), '<='));
+        if ($request->get('date_to')) {
+            $criteria->push(new DateCriterion('ta.term', $request->get('date_to'), '<='));
         }
 
         if ($request->get('ids')) {

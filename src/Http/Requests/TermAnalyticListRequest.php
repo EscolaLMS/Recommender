@@ -34,8 +34,8 @@ class TermAnalyticListRequest extends FormRequest
         return [
             'name' => ['string'],
             'order_by' => ['sometimes', 'string', 'in:id,name,term'],
-            'term_from' => ['string'],
-            'term_to' => ['string'],
+            'date_from' => ['string'],
+            'date_to' => ['string'],
             'ids' => ['sometimes', 'array'],
             'ids.*' => ['integer'],
         ];

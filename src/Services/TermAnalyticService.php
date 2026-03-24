@@ -107,6 +107,49 @@ class TermAnalyticService implements TermAnalyticServiceContract
         return $this->termAnalyticsRepository->findByCriteria($modelType, $criteriaDto, $pageDto->getPerPage(), $orderDto);
     }
 
+    public function modelAnalyticsForTerm(int $termAnalyticId): AggregatedFrame
+    {
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
+        if ($pgsql) {
+            $selectRaw = "
+                term,
+
+                SUM(count) as total_count,
+
+                SUM(sum_attention) / NULLIF(SUM(count)::numeric,0) as avg_attention,
+                SUM(sum_emotions_angry) / NULLIF(SUM(count)::numeric,0) as avg_emotions_angry,
+                SUM(sum_emotions_disgusted) / NULLIF(SUM(count)::numeric,0) as avg_emotions_disgusted,
+                SUM(sum_emotions_fearful) / NULLIF(SUM(count)::numeric,0) as avg_emotions_fearful,
+                SUM(sum_emotions_happy) / NULLIF(SUM(count)::numeric,0) as avg_emotions_happy,
+                SUM(sum_emotions_neutral) / NULLIF(SUM(count)::numeric,0) as avg_emotions_neutral,
+                SUM(sum_emotions_sad) / NULLIF(SUM(count)::numeric,0) as avg_emotions_sad,
+                SUM(sum_emotions_surprised) / NULLIF(SUM(count)::numeric,0) as avg_emotions_surprised
+            ";
+        } else {
+            $selectRaw = "
+                term,
+
+                SUM(count) as total_count,
+
+                SUM(sum_attention) / NULLIF(SUM(count), 0) as avg_attention,
+                SUM(sum_emotions_angry) / NULLIF(SUM(count), 0) as avg_emotions_angry,
+                SUM(sum_emotions_disgusted) / NULLIF(SUM(count), 0) as avg_emotions_disgusted,
+                SUM(sum_emotions_fearful) / NULLIF(SUM(count), 0) as avg_emotions_fearful,
+                SUM(sum_emotions_happy) / NULLIF(SUM(count), 0) as avg_emotions_happy,
+                SUM(sum_emotions_neutral) / NULLIF(SUM(count), 0) as avg_emotions_neutral,
+                SUM(sum_emotions_sad) / NULLIF(SUM(count), 0) as avg_emotions_sad,
+                SUM(sum_emotions_surprised) / NULLIF(SUM(count), 0) as avg_emotions_surprised
+            ";
+        }
+
+        return AggregatedFrame::query()
+            ->selectRaw($selectRaw)
+            ->where('term_analytic_id', $termAnalyticId)
+            ->groupBy('term')
+            ->first();
+    }
+
     public function modelAnalytics(string $modelType, int $modelId, ?int $term = null): Collection|AggregatedFrame
     {
         $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
