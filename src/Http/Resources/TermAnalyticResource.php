@@ -77,6 +77,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *             description="model_name",
  *             type="string",
  *         ),
+ *     @OA\Property(
+ *              property="rating",
+ *              description="Model term users rating",
+ *              type="string",
+ *          ),
  * )
  */
 class TermAnalyticResource extends JsonResource
@@ -99,6 +104,8 @@ class TermAnalyticResource extends JsonResource
             'avg_emotions_surprised' => $this->resource->avg_emotions_surprised,
             'max_emotion' => $this->resource->max_emotion,
             'max_emotion_value' => $this->resource->max_emotion_value,
+            'rating' => $this->resource->rating ?? 0,
+            // TODO jeszcze nagranie ze spotkania jakoś wyłuskać...
         ];
     }
 }

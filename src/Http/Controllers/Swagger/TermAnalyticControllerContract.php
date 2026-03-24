@@ -3,6 +3,7 @@
 namespace EscolaLms\Recommender\Http\Controllers\Swagger;
 
 use EscolaLms\Recommender\Http\Requests\TermAnalyticListRequest;
+use EscolaLms\Recommender\Http\Requests\TermAnalyticRequest;
 use Illuminate\Http\JsonResponse;
 
 interface TermAnalyticControllerContract
@@ -36,7 +37,7 @@ interface TermAnalyticControllerContract
      *            in="query"
      *        ),
      *     @OA\Parameter(
-     *             name="term_from",
+     *             name="date_from",
      *             description="Term date from",
      *             @OA\Schema(
      *                type="string",
@@ -45,7 +46,7 @@ interface TermAnalyticControllerContract
      *             in="query"
      *         ),
      *     @OA\Parameter(
-     *             name="term_to",
+     *             name="date_to",
      *             description="Term date to",
      *             @OA\Schema(
      *                type="string",
@@ -53,6 +54,42 @@ interface TermAnalyticControllerContract
      *             required=false,
      *             in="query"
      *         ),
+     *     @OA\Parameter(
+     *              name="order_by",
+     *              description="Order by: id, name, term",
+     *              @OA\Schema(
+     *                 type="string",
+     *             ),
+     *              required=false,
+     *              in="query"
+     *          ),
+     *     @OA\Parameter(
+     *               name="order",
+     *               description="asc or desc",
+     *               @OA\Schema(
+     *                  type="string",
+     *              ),
+     *               required=false,
+     *               in="query"
+     *           ),
+     *     @OA\Parameter(
+     *                name="per_page",
+     *                description="Elements per page",
+     *                @OA\Schema(
+     *                   type="int",
+     *               ),
+     *                required=false,
+     *                in="query"
+     *            ),
+     *     @OA\Parameter(
+     *                 name="page",
+     *                 description="Page",
+     *                 @OA\Schema(
+     *                    type="int",
+     *                ),
+     *                 required=false,
+     *                 in="query"
+     *             ),
      *      @OA\Response(
      *           response=200,
      *           description="successful operation",
@@ -163,7 +200,7 @@ interface TermAnalyticControllerContract
      *       ),
      *      @OA\Parameter(
      *          name="term",
-     *          description="Model term",
+     *          description="Model term id",
      *          @OA\Schema(
      *             type="integer",
      *         ),
@@ -195,5 +232,5 @@ interface TermAnalyticControllerContract
      *       )
      * )
      */
-    public function modelTermAnalytics(string $modelType, int $modelId, int $term): JsonResponse;
+    public function modelTermAnalytics(TermAnalyticRequest $request, string $modelType, int $modelId, int $term): JsonResponse;
 }
