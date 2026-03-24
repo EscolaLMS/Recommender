@@ -203,18 +203,6 @@ class TermAnalyticTest extends TestCase
         $modelId = 1;
         $term = Carbon::now();
 
-        AggregatedFrame::factory()->count(5)->create([
-            'model_type' => $modelType,
-            'model_id' => $modelId,
-            'term' => $term,
-            'sum_attention' => 1,
-            'count' => 1,
-            'sum_emotions_happy' => 0.6,
-            'sum_emotions_sad' => 0.4,
-        ]);
-
-        $termTimestamp = $term->timestamp;
-
         $termAnalytic = TermAnalytic::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
@@ -224,6 +212,17 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
             'aggregated_frames_count' => 1,
+        ]);
+
+        AggregatedFrame::factory()->count(5)->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'term_analytic_id' => $termAnalytic->getKey(),
         ]);
 
         $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/{$termAnalytic->getKey()}");
