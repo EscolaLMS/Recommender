@@ -25,4 +25,12 @@ class TermAnalyticRequest extends FormRequest
 
         return Gate::allows('list', $modelClass);
     }
+
+
+    public function rules(): array
+    {
+        return [
+            //
+        ];
+    }
 }
