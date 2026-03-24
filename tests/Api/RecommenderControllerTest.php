@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
+use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Courses\Database\Seeders\CoursesPermissionSeeder;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
@@ -22,6 +23,7 @@ class RecommenderControllerTest extends TestCase
         parent::setUp();
 
         $this->seed(CoursesPermissionSeeder::class);
+        $this->seed(ConsultationsPermissionSeeder::class);
 
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.course_model', '{"model": "course"}');
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.exercise_model', '{"model": "exercise"}');
