@@ -58,7 +58,7 @@ class MeetRecordingTest extends TestCase
             'url_expiration_time_millis' => null,
         ]);
 
-        $now = Carbon::now();
+        $now = Carbon::now()->format('Y-m-d H:i:s');
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
             'model_type' => 'consultation',
             'model_id' => 1,
