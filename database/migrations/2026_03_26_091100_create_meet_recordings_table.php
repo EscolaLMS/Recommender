@@ -1,6 +1,5 @@
 <?php
 
-use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,6 +31,16 @@ return new class extends Migration
             $table->index(['model_type', 'model_id']);
             $table->index(['model_type', 'term']);
         });
+
+        Schema::create('meet_recording_screens', function (Blueprint $table) {
+            $table->id();
+            $table->string('model_type');
+            $table->unsignedInteger('model_id');
+            $table->dateTime('term');
+            $table->string('file_path');
+            $table->timestamp('file_timestamp');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -42,5 +51,6 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('meet_recordings');
+        Schema::dropIfExists('meet_recording_screens');
     }
 };

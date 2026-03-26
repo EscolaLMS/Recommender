@@ -9,7 +9,9 @@ use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class MeetRecordingTest extends TestCase
 {
@@ -77,8 +79,39 @@ class MeetRecordingTest extends TestCase
             'term' => $term,
             'start_at' => $start,
             'end_at' => $now,
-            'url' => 'http://test-recording.com',
+            'url' => 'https://test-recording.com',
             'url_expiration_time_millis' => 123456,
+        ]);
+    }
+
+    public function testMeetRecordingScreen(): void
+    {
+        $time = Carbon::now();
+        $screenTime = Carbon::now()->addMinutes(10);
+        $screenTime2 = Carbon::now()->addMinutes(15);
+        Storage::fake();
+        $this->postJson('api/recommender/meet-recordings/screens', [
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $time->getTimestamp(),
+            'files' => [
+                [
+                    'file' => UploadedFile::fake()->image('image.jpg'),
+                    'timestamp' => $screenTime->format('Y-m-d H:i:s'),
+                ],
+                [
+                    'file' => UploadedFile::fake()->image('image.jpg'),
+                    'timestamp' => $screenTime2->format('Y-m-d H:i:s'),
+                ]
+            ]
+        ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('meet_recordings_screens', [
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $time,
+            'file_timestamp' => $screenTime->format('Y-m-d H:i:s'),
         ]);
     }
 }

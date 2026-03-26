@@ -4,11 +4,13 @@ namespace EscolaLms\Recommender\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Recommender\Dto\MeetRecordingDto;
+use EscolaLms\Recommender\Dto\MeetRecordingScreenDto;
 use EscolaLms\Recommender\Http\Controllers\Swagger\RecommenderControllerSwagger;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameRequest;
 use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
 use EscolaLms\Recommender\Http\Requests\MeetRecordingRequest;
+use EscolaLms\Recommender\Http\Requests\MeetRecordingScreen;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
 use EscolaLms\Recommender\Http\Resources\CourseRecommendationResource;
@@ -71,5 +73,13 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
         return $this->sendResponseForResource(
             MeetRecordingResource::make($model), __('Meet recording saved successfully')
         );
+    }
+
+    public function meetRecordingScreen(MeetRecordingScreen $request): JsonResponse
+    {
+        $dto = new MeetRecordingScreenDto($request->all());
+        $this->recommenderService->meetRecordingScreen($dto);
+
+        return $this->sendResponse(__('Meet recording screens saved successfully'));
     }
 }

@@ -18,6 +18,7 @@ Route::prefix('api/admin/recommender')
 Route::prefix('api/recommender')->group(function () {
     Route::middleware(['auth:api'])->group(function () {
         Route::post('/meet-recordings', [RecommenderController::class, 'meetRecordings']);
+        Route::post('/meet-recordings/screens', [RecommenderController::class, 'meetRecordingScreen']);
     });
 
     Route::middleware('verifySignature')->group(function () {

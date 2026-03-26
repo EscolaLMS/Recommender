@@ -3,6 +3,7 @@
 namespace EscolaLms\Recommender\Services;
 
 use EscolaLms\Recommender\Dto\MeetRecordingDto;
+use EscolaLms\Recommender\Dto\MeetRecordingScreenDto;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
@@ -10,15 +11,18 @@ use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\MeetRecording;
+use EscolaLms\Recommender\Models\MeetRecordingScreen;
 use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -322,5 +326,25 @@ class RecommenderService implements RecommenderServiceContract
 
         $meetRecording->update($dto->toArray());
         return $meetRecording;
+    }
+
+    public function meetRecordingScreen(MeetRecordingScreenDto $dto): void
+    {
+        $term = Carbon::make($dto->getTerm())->getTimestamp();
+        $folder = "{$dto->getModelType()}/{$dto->getModelId()}/{$term}/presentation";
+
+        foreach ($dto->getFiles() as $file) {
+            $screen = $file['file'];
+            $extension = $screen instanceof UploadedFile ? $screen->getClientOriginalExtension() : Str::between($screen, 'data:image/', ';base64');
+            $filePath = Storage::putFileAs($folder, $screen, Carbon::make($file['timestamp'])->getTimestamp() . '.' . $extension);
+
+            MeetRecordingScreen::query()->create([
+                'model_type' => $dto->getModelType(),
+                'model_id' => $dto->getModelId(),
+                'term' => $term,
+                'file_path' => $filePath,
+                'file_timestamp' => $file['timestamp'],
+            ]);
+        };
     }
 }
