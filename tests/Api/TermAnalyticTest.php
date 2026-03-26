@@ -2,8 +2,8 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
-use App\Models\Consultation;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Jobs\RebuildTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
