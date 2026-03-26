@@ -225,7 +225,7 @@ class TermAnalyticTest extends TestCase
             'term_analytic_id' => $termAnalytic->getKey(),
         ]);
 
-        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/{$termAnalytic->getKey()}");
+        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/" . $termAnalytic->getKey());
 
         $response->assertStatus(200)
             ->assertJsonStructure([
