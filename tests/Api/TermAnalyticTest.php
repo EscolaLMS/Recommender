@@ -239,8 +239,6 @@ class TermAnalyticTest extends TestCase
                     'rating',
                     'url',
                     'url_expiration_time_millis',
-                    'max_emotion',
-                    'max_emotion_percentage',
                 ],
             ]);
     }
