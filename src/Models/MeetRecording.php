@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Schema(
  *     schema="MeetRecording",
- *     required={"model_type", "model_id", "term", "time", "type"},
+ *     required={"model_type", "model_id", "term"},
  *     @OA\Property(
  *           property="id",
  *           description="id",

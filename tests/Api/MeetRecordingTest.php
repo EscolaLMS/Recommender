@@ -29,7 +29,7 @@ class MeetRecordingTest extends TestCase
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
-            'start_at' => Carbon::now(),
+            'start_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'action' => MeetRecordingEnum::START_RECORDING,
         ])->assertCreated();
 
@@ -59,7 +59,7 @@ class MeetRecordingTest extends TestCase
         ]);
 
         $now = Carbon::now();
-        $this->actingAs($this->makeAdmin(), 'api')->putJson('api/recommender/meet-recordings', [
+        $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
