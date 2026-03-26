@@ -93,7 +93,7 @@ class MeetRecordingTest extends TestCase
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings/screens', [
             'model_type' => 'consultation',
             'model_id' => 1,
-            'term' => $time->getTimestamp(),
+            'term' => $time,
             'files' => [
                 [
                     'file' => UploadedFile::fake()->image('image.jpg'),
@@ -107,11 +107,20 @@ class MeetRecordingTest extends TestCase
         ])
             ->assertOk();
 
+        $this->assertDatabaseCount('meet_recording_screens', 2);
+
         $this->assertDatabaseHas('meet_recordings_screens', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time,
             'file_timestamp' => $screenTime->format('Y-m-d H:i:s'),
+        ]);
+
+        $this->assertDatabaseHas('meet_recordings_screens', [
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $time,
+            'file_timestamp' => $screenTime2->format('Y-m-d H:i:s'),
         ]);
     }
 }
