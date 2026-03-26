@@ -5,6 +5,7 @@ namespace EscolaLms\Recommender\Http\Controllers\Swagger;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameRequest;
 use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
+use EscolaLms\Recommender\Http\Requests\MeetRecordingRequest;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use Illuminate\Http\JsonResponse;
 
@@ -171,4 +172,47 @@ interface RecommenderControllerSwagger
      * )
      */
     public function aggregateFrames(AggregatedFrameListRequest $request, string $modelType, int $modelId, int $term): JsonResponse;
+
+    /**
+     * @OA\Post (
+     *      path="/api/admin/recommender/meet-recordings",
+     *      summary="Meet recordings",
+     *      tags={"Admin Recommender"},
+     *      description="Set meet recording time start or stop",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *     @OA\RequestBody(
+     *           required=true,
+     *           @OA\MediaType(
+     *               mediaType="application/json",
+     *               @OA\Schema(ref="#/components/schemas/MeetRecording")
+     *           ),
+     *       ),
+     *      @OA\Response(
+     *           response=201,
+     *           description="successful operation",
+     *           @OA\MediaType(
+     *               mediaType="application/json"
+     *           ),
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   type="array",
+     *                   @OA\Items(ref="#/components/schemas/AggregatedFrame")
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     * )
+     */
+    public function meetRecordings(MeetRecordingRequest $request): JsonResponse;
 }

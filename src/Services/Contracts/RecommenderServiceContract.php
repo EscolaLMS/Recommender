@@ -3,6 +3,8 @@
 namespace EscolaLms\Recommender\Services\Contracts;
 
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
+use EscolaLms\Recommender\Dto\MeetRecordingDto;
+use EscolaLms\Recommender\Models\MeetRecording;
 
 interface RecommenderServiceContract
 {
@@ -16,4 +18,6 @@ interface RecommenderServiceContract
 
     public function aggregatedFrameSave(AggregatedFrameDto $dto): void;
     public function aggregatedFrames(string $modelType, int $modelId, int $term, int $interval);
+
+    public function meetRecording(MeetRecordingDto $dto): MeetRecording;
 }

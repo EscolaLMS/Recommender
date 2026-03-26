@@ -104,8 +104,9 @@ class TermAnalyticResource extends JsonResource
             'avg_emotions_surprised' => $this->resource->avg_emotions_surprised,
             'max_emotion' => $this->resource->max_emotion,
             'max_emotion_value' => $this->resource->max_emotion_value,
-            'rating' => $this->resource->rating ?? 0,
-            // TODO jeszcze nagranie ze spotkania jakoś wyłuskać...
+            'rating' => $this->resource->rating ?? random_int(1, 5),
+            'url' => $this->resource->url ?? null,
+            'url_expiration_time_millis' => $this->resource->url_expiration_time_millis ?? null,
         ];
     }
 }

@@ -52,6 +52,21 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
         return $query->paginate($perPage);
     }
 
+    public function findById(string $modelType, int $id): TermAnalytic
+    {
+        $modelTable = $this->resolveModelTable($modelType);
+
+        return TermAnalytic::query()
+            ->from('term_analytics as ta')
+            ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
+            ->where('ta.id', $id)
+            ->select([
+                'ta.*',
+                'm.name as model_name',
+            ])
+            ->firstOrFail();
+    }
+
     private function resolveModelTable(string $modelType): string
     {
         return match ($modelType) {

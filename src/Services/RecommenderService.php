@@ -2,11 +2,13 @@
 
 namespace EscolaLms\Recommender\Services;
 
+use EscolaLms\Recommender\Dto\MeetRecordingDto;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Models\AggregatedFrame;
+use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
@@ -302,5 +304,10 @@ class RecommenderService implements RecommenderServiceContract
             ->groupBy('bucket_start')
             ->orderBy('bucket_start')
             ->get();
+    }
+
+    public function meetRecording(MeetRecordingDto $dto): MeetRecording
+    {
+        return MeetRecording::query()->create($dto->toArray());
     }
 }
