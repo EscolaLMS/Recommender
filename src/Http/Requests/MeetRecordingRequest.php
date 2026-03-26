@@ -25,9 +25,7 @@ class MeetRecordingRequest extends FormRequest
             return false;
         }
 
-        $model = $modelClass::query()->findOrFail($this->get('model_id'));
-
-        return Gate::allows('update', $model);
+        return Gate::allows('create', $modelClass);
     }
 
     public function rules(): array
