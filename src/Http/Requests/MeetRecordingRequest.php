@@ -13,7 +13,7 @@ class MeetRecordingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $modelType = $this->route('modelType');
+        $modelType = $this->get('model_type');
 
         $modelClass = match ($modelType) {
             'consultation' => Consultation::class,
