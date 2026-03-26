@@ -15,14 +15,12 @@ Route::prefix('api/admin/recommender')
         Route::get('/terms/{modelType}', [TermAnalyticController::class, 'index']);
     });
 
-Route::prefix('api/recommender')
-    ->middleware(['auth:api'])
-    ->group(function () {
+Route::prefix('api/recommender')->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
         Route::post('/meet-recordings', [RecommenderController::class, 'meetRecordings']);
     });
 
-Route::prefix('api/recommender')
-    ->middleware('verifySignature')
-    ->group(function () {
+    Route::middleware('verifySignature')->group(function () {
         Route::post('/aggregated-frames/save', [RecommenderController::class, 'aggregateFrameSave']);
     });
+});

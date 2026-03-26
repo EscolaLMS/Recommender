@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
+use App\Models\Consultation;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Jobs\RebuildTermAnalyticJob;
@@ -199,8 +200,9 @@ class TermAnalyticTest extends TestCase
 
     public function testModelTermAnalyticsReturnsSingleTerm(): void
     {
+        $consultation = Consultation::factory()->create();
         $modelType = 'consultation';
-        $modelId = 1;
+        $modelId = $consultation->getKey();
         $term = Carbon::now();
 
         $termAnalytic = TermAnalytic::factory()->create([
