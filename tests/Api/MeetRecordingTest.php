@@ -24,7 +24,7 @@ class MeetRecordingTest extends TestCase
     public function testCreateMeetRecordingStart(): void
     {
         $term = Carbon::now()->subMinutes(30);
-        $this->actingAs($this->makeAdmin())->postJson('api/recommender/meet-recordings', [
+        $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
