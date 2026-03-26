@@ -3,6 +3,7 @@
 namespace EscolaLms\Recommender\Tests\Api;
 
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Jobs\RebuildTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
@@ -199,8 +200,9 @@ class TermAnalyticTest extends TestCase
 
     public function testModelTermAnalyticsReturnsSingleTerm(): void
     {
+        $consultation = Consultation::factory()->create();
         $modelType = 'consultation';
-        $modelId = 1;
+        $modelId = $consultation->getKey();
         $term = Carbon::now();
 
         $termAnalytic = TermAnalytic::factory()->create([
@@ -214,7 +216,7 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
         ]);
 
-        AggregatedFrame::factory()->count(5)->create([
+        AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
@@ -225,15 +227,18 @@ class TermAnalyticTest extends TestCase
             'term_analytic_id' => $termAnalytic->getKey(),
         ]);
 
-        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/{$termAnalytic->getKey()}");
+        $response = $this->actingAs($this->makeAdmin(), 'api')->getJson("api/admin/recommender/analytics/{$modelType}/{$modelId}/" . $termAnalytic->getKey());
 
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
                     'term',
-                    'attention',
-                    'max_emotion',
-                    'max_emotion_percentage',
+                    'model_id',
+                    'model_type',
+                    'model_name',
+                    'rating',
+                    'url',
+                    'url_expiration_time_millis',
                 ],
             ]);
     }

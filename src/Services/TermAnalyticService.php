@@ -107,6 +107,11 @@ class TermAnalyticService implements TermAnalyticServiceContract
         return $this->termAnalyticsRepository->findByCriteria($modelType, $criteriaDto, $pageDto->getPerPage(), $orderDto);
     }
 
+    public function termAnalytic(string $modelType, int $id): TermAnalytic
+    {
+        return $this->termAnalyticsRepository->findById($modelType, $id);
+    }
+
     public function modelAnalyticsForTerm(int $termAnalyticId): AggregatedFrame
     {
         $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';

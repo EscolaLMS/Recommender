@@ -26,6 +26,13 @@ class TermAnalyticController extends EscolaLmsBaseController implements TermAnal
         );
     }
 
+    public function show(TermAnalyticRequest $request, string $modelType, int $modelId, int $id): JsonResponse
+    {
+        return $this->sendResponseForResource(
+            TermAnalyticResource::make($this->termAnalyticService->termAnalytic($modelType, $id), __('Terms analytic retrieved successfully'))
+        );
+    }
+
     public function modelAnalytics(string $modelType, int $modelId): JsonResponse
     {
         $data = $this->termAnalyticService->modelAnalytics($modelType, $modelId);

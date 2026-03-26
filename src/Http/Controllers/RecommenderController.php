@@ -3,13 +3,18 @@
 namespace EscolaLms\Recommender\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Recommender\Dto\MeetRecordingDto;
+use EscolaLms\Recommender\Dto\MeetRecordingScreenDto;
 use EscolaLms\Recommender\Http\Controllers\Swagger\RecommenderControllerSwagger;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameRequest;
 use EscolaLms\Recommender\Http\Requests\CourseRecommendationRequest;
+use EscolaLms\Recommender\Http\Requests\MeetRecordingRequest;
+use EscolaLms\Recommender\Http\Requests\MeetRecordingScreen;
 use EscolaLms\Recommender\Http\Requests\TopicRecommendationRequest;
 use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
 use EscolaLms\Recommender\Http\Resources\CourseRecommendationResource;
+use EscolaLms\Recommender\Http\Resources\MeetRecordingResource;
 use EscolaLms\Recommender\Http\Resources\TopicRecommendationResource;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
@@ -58,5 +63,23 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
         $data = $this->recommenderService->aggregatedFrames($modelType, $modelId, $term, $request->get('interval'));
 
         return $this->sendResponseForResource(AggregatedFrameResource::collection($data), __('Aggregated Frames retrieved successfully'));
+    }
+
+    public function meetRecordings(MeetRecordingRequest $request): JsonResponse
+    {
+        $dto = new MeetRecordingDto($request->all());
+        $model = $this->recommenderService->meetRecording($dto);
+
+        return $this->sendResponseForResource(
+            MeetRecordingResource::make($model), __('Meet recording saved successfully')
+        );
+    }
+
+    public function meetRecordingScreen(MeetRecordingScreen $request): JsonResponse
+    {
+        $dto = new MeetRecordingScreenDto($request->all());
+        $this->recommenderService->meetRecordingScreen($dto);
+
+        return $this->sendResponse(__('Meet recording screens saved successfully'));
     }
 }

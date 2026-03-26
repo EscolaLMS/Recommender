@@ -11,12 +11,17 @@ Route::prefix('api/admin/recommender')
         Route::get('/lesson/{lessonId}/topic', [RecommenderController::class, 'topic']);
         Route::get('/aggregated-frames/{modelType}/{modelId}/{term}', [RecommenderController::class, 'aggregateFrames']);
         Route::get('/analytics/{modelType}/{modelId}', [TermAnalyticController::class, 'modelAnalytics']);
-        Route::get('/analytics/{modelType}/{modelId}/{term}', [TermAnalyticController::class, 'modelTermAnalytics']);
+        Route::get('/analytics/{modelType}/{modelId}/{id}', [TermAnalyticController::class, 'show']);
         Route::get('/terms/{modelType}', [TermAnalyticController::class, 'index']);
     });
 
-Route::prefix('api/recommender')
-    ->middleware('verifySignature')
-    ->group(function () {
+Route::prefix('api/recommender')->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
+        Route::post('/meet-recordings', [RecommenderController::class, 'meetRecordings']);
+        Route::post('/meet-recordings/screens', [RecommenderController::class, 'meetRecordingScreen']);
+    });
+
+    Route::middleware('verifySignature')->group(function () {
         Route::post('/aggregated-frames/save', [RecommenderController::class, 'aggregateFrameSave']);
     });
+});
