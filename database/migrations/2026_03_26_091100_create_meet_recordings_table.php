@@ -21,9 +21,9 @@ return new class extends Migration
             $table->unsignedInteger('model_id');
             $table->dateTime('term');
 
-            $table->dateTime('time');
-            $table->enum('type', MeetRecordingEnum::getValues());
-            $table->string('recording_url')->nullable();
+            $table->dateTime('start_at');
+            $table->dateTime('end_at')->nullable();
+            $table->string('url')->nullable();
             $table->unsignedBigInteger('url_expiration_time_millis')->nullable();
 
             $table->timestamps();

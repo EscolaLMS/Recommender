@@ -10,12 +10,12 @@ class MeetRecordingResource extends JsonResource
     {
         return [
             'id' => $this->resource->getKey(),
-            'time' => $this->resource->time,
-            'type' => $this->resource->type,
+            'start_at' => $this->resource->start_at,
+            'end_at' => $this->resource->end_at,
             'model_type' => $this->resource->model_type,
             'model_id' => $this->resource->model_id,
             'term' => $this->resource->term,
-            'url' => $this->resource->recording_url,
+            'url' => $this->resource->url,
             'url_expiration_time_millis' => $this->resource->url_expiration_time_millis,
         ];
     }

@@ -31,11 +31,15 @@ class MeetRecordingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'time' => ['required', 'date'],
-            'type' => ['required', 'in:' . implode(',', MeetRecordingEnum::getValues())],
+            'start_at' => ['sometimes', 'date'],
+            'end_at' => ['sometimes', 'date'],
+            'action' => ['required', 'in:' . implode(',', MeetRecordingEnum::getValues())],
             'model_type' => ['required', 'in:consultation,webinar'],
             'model_id' => ['required'],
             'term' => ['required'],
+            'url' => ['sometimes', 'url'],
+            'url_expiration_time_millis' => ['sometimes', 'integer'],
+            'id' => ['sometimes', 'integer'],
         ];
     }
 }

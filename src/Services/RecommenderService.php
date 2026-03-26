@@ -4,6 +4,7 @@ namespace EscolaLms\Recommender\Services;
 
 use EscolaLms\Recommender\Dto\MeetRecordingDto;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
+use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
@@ -14,6 +15,7 @@ use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -308,6 +310,17 @@ class RecommenderService implements RecommenderServiceContract
 
     public function meetRecording(MeetRecordingDto $dto): MeetRecording
     {
-        return MeetRecording::query()->create($dto->toArray());
+        if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
+            return MeetRecording::query()->create($dto->toArray());
+        }
+
+        if (!$dto->getId()) {
+            throw new ModelNotFoundException();
+        }
+
+        $meetRecording = MeetRecording::query()->where('id', '=', $dto->getId())->firstOrFail();
+
+        $meetRecording->update($dto->toArray());
+        return $meetRecording;
     }
 }

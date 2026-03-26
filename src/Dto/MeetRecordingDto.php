@@ -6,11 +6,15 @@ use EscolaLms\Recommender\Models\MeetRecording;
 
 class MeetRecordingDto extends BaseDto
 {
-    protected string $time;
-    protected string $type;
     protected string $modelType;
     protected string $modelId;
     protected string $term;
+    protected string $action;
+    protected ?string $startAt = null;
+    protected ?string $endAt = null;
+    protected ?string $url = null;
+    protected ?int $url_expiration_time_millis = null;
+    protected ?int $id;
 
     public function model(): MeetRecording
     {
@@ -22,26 +26,6 @@ class MeetRecordingDto extends BaseDto
     {
         $result = $this->fillInArray($this->model()->getFillable());
         return $filters ? array_filter($result) : $result;
-    }
-
-    public function getTime(): string
-    {
-        return $this->time;
-    }
-
-    public function setTime(string $time): void
-    {
-        $this->time = $time;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): void
-    {
-        $this->type = $type;
     }
 
     public function getModelType(): string
@@ -72,5 +56,65 @@ class MeetRecordingDto extends BaseDto
     public function setTerm(string $term): void
     {
         $this->term = $term;
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    public function setAction(string $action): void
+    {
+        $this->action = $action;
+    }
+
+    public function getStartAt(): ?string
+    {
+        return $this->startAt;
+    }
+
+    public function setStartAt(?string $startAt): void
+    {
+        $this->startAt = $startAt;
+    }
+
+    public function getEndAt(): ?string
+    {
+        return $this->endAt;
+    }
+
+    public function setEndAt(?string $endAt): void
+    {
+        $this->endAt = $endAt;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): void
+    {
+        $this->url = $url;
+    }
+
+    public function getUrlExpirationTimeMillis(): ?int
+    {
+        return $this->url_expiration_time_millis;
+    }
+
+    public function setUrlExpirationTimeMillis(?int $url_expiration_time_millis): void
+    {
+        $this->url_expiration_time_millis = $url_expiration_time_millis;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 }

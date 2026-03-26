@@ -31,15 +31,15 @@ use Illuminate\Database\Eloquent\Model;
  *            type="timestamp",
  *        ),
  *     @OA\Property(
- *            property="time",
- *            description="time",
+ *            property="start_at",
+ *            description="start_at",
  *            type="datetime",
  *        ),
  *     @OA\Property(
- *            property="type",
- *            description="type",
- *            type="string",
- *        ),
+ *             property="end_at",
+ *             description="end_at",
+ *             type="datetime",
+ *         ),
  *     @OA\Property(
  *            property="url",
  *            description="url",
@@ -60,9 +60,9 @@ class MeetRecording extends Model
         'model_type',
         'model_id',
         'term',
-        'time',
-        'type',
-        'recording_url',
+        'start_at',
+        'end_at',
+        'url',
         'url_expiration_time_millis',
     ];
 

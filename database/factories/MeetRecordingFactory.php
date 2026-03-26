@@ -13,12 +13,12 @@ class MeetRecordingFactory extends Factory
     public function definition()
     {
         return [
-            'time' => $this->faker->dateTime(),
-            'type' => $this->faker->randomElement(MeetRecordingEnum::getValues()),
+            'start_at' => $this->faker->dateTime(),
+            'end_at' => $this->faker->dateTime(),
             'model_type' => $this->faker->randomElement(['consultation', 'webinar']),
             'model_id' => $this->faker->randomNumber(),
             'term' => $this->faker->dateTime(),
-            'recording_url' => $this->faker->url(),
+            'url' => $this->faker->url(),
             'url_expiration_time_millis' => $this->faker->dateTime()->getTimestamp(),
         ];
     }
