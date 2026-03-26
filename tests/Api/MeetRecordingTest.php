@@ -90,7 +90,7 @@ class MeetRecordingTest extends TestCase
         $screenTime = Carbon::now()->addMinutes(10);
         $screenTime2 = Carbon::now()->addMinutes(15);
         Storage::fake();
-        $this->postJson('api/recommender/meet-recordings/screens', [
+        $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings/screens', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time->getTimestamp(),
