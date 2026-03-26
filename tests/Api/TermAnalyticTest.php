@@ -233,7 +233,12 @@ class TermAnalyticTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'term',
-                    'attention',
+                    'model_id',
+                    'model_type',
+                    'model_name',
+                    'rating',
+                    'url',
+                    'url_expiration_time_millis',
                     'max_emotion',
                     'max_emotion_percentage',
                 ],
