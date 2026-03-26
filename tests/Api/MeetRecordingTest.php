@@ -79,7 +79,7 @@ class MeetRecordingTest extends TestCase
             'term' => $term,
             'start_at' => $start,
             'end_at' => $now,
-            'url' => 'https://test-recording.com',
+            'url' => 'http://test-recording.com',
             'url_expiration_time_millis' => 123456,
         ]);
     }
