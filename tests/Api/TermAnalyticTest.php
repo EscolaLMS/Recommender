@@ -214,7 +214,7 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
         ]);
 
-        AggregatedFrame::factory()->count(5)->create([
+        AggregatedFrame::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,

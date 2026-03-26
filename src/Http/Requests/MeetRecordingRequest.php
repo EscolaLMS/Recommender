@@ -2,12 +2,12 @@
 
 namespace EscolaLms\Recommender\Http\Requests;
 
+use BenSampo\Enum\Rules\Enum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Webinar\Models\Webinar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rules\Enum;
 
 class MeetRecordingRequest extends FormRequest
 {
@@ -25,14 +25,16 @@ class MeetRecordingRequest extends FormRequest
             return false;
         }
 
-        return Gate::allows('update', $modelClass);
+        $model = $modelClass::query()->findOrFail($this->get('model_id'));
+
+        return Gate::allows('update', $model);
     }
 
     public function rules(): array
     {
         return [
             'time' => ['required', 'date'],
-            'type' => ['required', new Enum(MeetRecordingEnum::class)],
+            'type' => ['required', 'in:' . implode(',', MeetRecordingEnum::getValues())],
             'model_type' => ['required', 'in:consultation,webinar'],
             'model_id' => ['required'],
             'term' => ['required'],
