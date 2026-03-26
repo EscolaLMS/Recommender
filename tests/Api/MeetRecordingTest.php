@@ -109,14 +109,14 @@ class MeetRecordingTest extends TestCase
 
         $this->assertDatabaseCount('meet_recording_screens', 2);
 
-        $this->assertDatabaseHas('meet_recordings_screens', [
+        $this->assertDatabaseHas('meet_recording_screens', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time,
             'file_timestamp' => $screenTime->format('Y-m-d H:i:s'),
         ]);
 
-        $this->assertDatabaseHas('meet_recordings_screens', [
+        $this->assertDatabaseHas('meet_recording_screens', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time,
