@@ -55,6 +55,7 @@ class TermAnalyticTest extends TestCase
         $modelId = 37;
         $term = Carbon::now();
         $startAt = Carbon::now();
+        $endAt = Carbon::now()->addMinutes(30);
 
         $aggregatedFrame = AggregatedFrame::factory()->create([
             'model_type' => $modelType,
@@ -64,8 +65,8 @@ class TermAnalyticTest extends TestCase
             'count' => 1,
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
-            'window_start' => $startAt->addSeconds(15),
-            'window_end' => $startAt->addSeconds(30),
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
         ]);
 
         MeetRecording::factory()->create([
@@ -73,7 +74,7 @@ class TermAnalyticTest extends TestCase
             'model_id' => $modelId,
             'term' => $term,
             'start_at' => $startAt,
-            'end_at' => $startAt->addMinutes(30),
+            'end_at' => $endAt,
         ]);
 
         $job = new RebuildTermAnalyticJob();
@@ -98,13 +99,14 @@ class TermAnalyticTest extends TestCase
         $modelId = 2137;
         $term = Carbon::now();
         $startAt = Carbon::now();
+        $endAt = Carbon::now()->addMinutes(30);
 
         $meet = MeetRecording::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
             'start_at' => $startAt,
-            'end_at' => $startAt->addMinutes(30),
+            'end_at' => $endAt,
         ]);
 
         $termAnalytic = TermAnalytic::factory()->create([
@@ -128,8 +130,8 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
             'term_analytic_id' => $termAnalytic->getKey(),
-            'window_start' => $startAt->addSeconds(15),
-            'window_end' => $startAt->addSeconds(30),
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
         ]);
 
         $aggregatedFrame = AggregatedFrame::factory()->create([
@@ -140,8 +142,8 @@ class TermAnalyticTest extends TestCase
             'count' => 1,
             'sum_emotions_happy' => 0.5,
             'sum_emotions_sad' => 0.5,
-            'window_start' => $startAt->addSeconds(30),
-            'window_end' => $startAt->addSeconds(45),
+            'window_start' => $startAt->copy()->addSeconds(30),
+            'window_end' => $startAt->copy()->addSeconds(45),
         ]);
 
         $job = new RebuildTermAnalyticJob();
@@ -158,8 +160,8 @@ class TermAnalyticTest extends TestCase
             'count' => 3,
             'sum_emotions_happy' => 0.5,
             'sum_emotions_sad' => 0.5,
-            'window_start' => $startAt->addSeconds(45),
-            'window_end' => $startAt->addSeconds(60),
+            'window_start' => $startAt->copy()->addSeconds(45),
+            'window_end' => $startAt->copy()->addSeconds(60),
         ]);
 
         $job = new RebuildTermAnalyticJob();
