@@ -367,8 +367,8 @@ class RecommenderService implements RecommenderServiceContract
 
     public function meetRecordingScreen(MeetRecordingScreenDto $dto): void
     {
-        $term = Carbon::make($dto->getTerm())->getTimestamp();
-        $folder = "{$dto->getModelType()}/{$dto->getModelId()}/{$term}/presentation";
+        $term = Carbon::make($dto->getTerm());
+        $folder = "{$dto->getModelType()}/{$dto->getModelId()}/{$term->getTimestamp()}/presentation";
 
         $recording = MeetRecording::query()
             ->where('model_type', $dto->getModelType())
