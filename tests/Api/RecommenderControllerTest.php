@@ -209,14 +209,14 @@ class RecommenderControllerTest extends TestCase
             ]);
         }
 
-        $response = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{}?interval=15");
+        $response = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{$termAnalytic->getKey()}?interval=15");
 
         $response->assertStatus(200);
         $data = $response->json('data');
 
         $this->assertCount(4, $data);
 
-        $response60 = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{}?interval=60");
+        $response60 = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{$termAnalytic->getKey()}?interval=60");
         $data60 = $response60->json('data');
 
         $this->assertCount(1, $data60);
