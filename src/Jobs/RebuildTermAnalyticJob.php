@@ -23,7 +23,7 @@ class RebuildTermAnalyticJob implements ShouldQueue
             ->get();
 
         foreach ($terms as $term) {
-            $termAnalyticService->rebuildTermAnalytic($term->model_type, $term->model_id, $term->term);
+            $termAnalyticService->updateTermAnalytic($term->model_type, $term->model_id, $term->term, $term->window_start);
         }
     }
 }

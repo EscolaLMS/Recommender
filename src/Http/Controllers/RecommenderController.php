@@ -58,13 +58,6 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
         return Response::noContent();
     }
 
-    public function aggregateFrames(AggregatedFrameListRequest $request, string $modelType, int $modelId, int $term): JsonResponse
-    {
-        $data = $this->recommenderService->aggregatedFrames($modelType, $modelId, $term, $request->get('interval'));
-
-        return $this->sendResponseForResource(AggregatedFrameResource::collection($data), __('Aggregated Frames retrieved successfully'));
-    }
-
     public function meetRecordings(MeetRecordingRequest $request): JsonResponse
     {
         $dto = new MeetRecordingDto($request->all());

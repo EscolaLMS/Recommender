@@ -4,8 +4,10 @@ namespace EscolaLms\Recommender\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Recommender\Http\Controllers\Swagger\TermAnalyticControllerContract;
+use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticListRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticRequest;
+use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
 use EscolaLms\Recommender\Http\Resources\ModelAnalyticsResource;
 use EscolaLms\Recommender\Http\Resources\TermAnalyticResource;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
@@ -31,6 +33,13 @@ class TermAnalyticController extends EscolaLmsBaseController implements TermAnal
         return $this->sendResponseForResource(
             TermAnalyticResource::make($this->termAnalyticService->termAnalytic($modelType, $id), __('Terms analytic retrieved successfully'))
         );
+    }
+
+    public function aggregatedFrames(AggregatedFrameListRequest $request, int $id): JsonResponse
+    {
+        $data = $this->termAnalyticService->aggregatedFrames($id, $request->get('interval'));
+
+        return $this->sendResponseForResource(AggregatedFrameResource::collection($data), __('Aggregated Frames retrieved successfully'));
     }
 
     public function modelAnalytics(string $modelType, int $modelId): JsonResponse

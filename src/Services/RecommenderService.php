@@ -9,9 +9,11 @@ use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
+use EscolaLms\Recommender\Jobs\UpdateTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\MeetRecordingScreen;
+use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Models\Topic;
 use EscolaLms\Recommender\Repositories\Contracts\TopicRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
@@ -260,6 +262,7 @@ class RecommenderService implements RecommenderServiceContract
         $aggregatedFrame = AggregatedFrame::query()->updateOrCreate(['external_id' => $dto->getExternalId()], array_merge($dto->toArray(), ['max_emotion' => $maxEmotion, 'max_emotion_value' => $maxEmotionValue]));
 
         event(new AggregatedFrameStored($aggregatedFrame));
+        UpdateTermAnalyticJob::dispatch($aggregatedFrame);
     }
 
     public function aggregatedFrames(string $modelType, int $modelId, int $term, int $interval)
@@ -315,16 +318,50 @@ class RecommenderService implements RecommenderServiceContract
     public function meetRecording(MeetRecordingDto $dto): MeetRecording
     {
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
-            return MeetRecording::query()->create($dto->toArray());
+
+            $exist = MeetRecording::query()
+                ->where('model_type', $dto->getModelType())
+                ->where('model_id', $dto->getModelId())
+                ->where('term', $dto->getTerm())
+                ->whereNull('end_at')
+                ->latest('start_at')
+                ->first();
+
+            if ($exist) {
+                throw new \RuntimeException('Active recording found for this term with ID: ' . $exist->getKey());
+            }
+
+            /** @var MeetRecording $meet */
+            $meet =  MeetRecording::query()->create($dto->toArray());
+
+            TermAnalytic::query()->create([
+                'model_type' => $dto->getModelType(),
+                'model_id' => $dto->getModelId(),
+                'term' => $dto->getTerm(),
+                'meet_recording_id' => $meet->getKey(),
+            ]);
+
+            return $meet;
         }
 
         if (!$dto->getId()) {
             throw new ModelNotFoundException();
         }
 
+        /** @var MeetRecording $meetRecording */
         $meetRecording = MeetRecording::query()->where('id', '=', $dto->getId())->firstOrFail();
 
         $meetRecording->update($dto->toArray());
+
+        if (!$meetRecording->termAnalytic()->exists()) {
+            TermAnalytic::query()->create([
+                'model_type' => $dto->getModelType(),
+                'model_id' => $dto->getModelId(),
+                'term' => $dto->getTerm(),
+                'meet_recording_id' => $meetRecording->getKey(),
+            ]);
+        }
+
         return $meetRecording;
     }
 
@@ -332,6 +369,18 @@ class RecommenderService implements RecommenderServiceContract
     {
         $term = Carbon::make($dto->getTerm())->getTimestamp();
         $folder = "{$dto->getModelType()}/{$dto->getModelId()}/{$term}/presentation";
+
+        $recording = MeetRecording::query()
+            ->where('model_type', $dto->getModelType())
+            ->where('model_id', $dto->getModelId())
+            ->where('term', $term)
+            ->whereNull('end_at')
+            ->latest('start_at')
+            ->first();
+
+        if (!$recording) {
+            throw new \RuntimeException('No active recording found');
+        }
 
         foreach ($dto->getFiles() as $file) {
             $screen = $file['file'];
@@ -344,6 +393,7 @@ class RecommenderService implements RecommenderServiceContract
                 'term' => $term,
                 'file_path' => $filePath,
                 'file_timestamp' => $file['timestamp'],
+                'meet_recording_id' => $recording->getKey(),
             ]);
         };
     }

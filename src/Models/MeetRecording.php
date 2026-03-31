@@ -5,6 +5,8 @@ namespace EscolaLms\Recommender\Models;
 use EscolaLms\Recommender\Database\Factories\MeetRecordingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @OA\Schema(
@@ -70,6 +72,16 @@ class MeetRecording extends Model
         'term' => 'datetime',
         'time' => 'datetime',
     ];
+
+    public function termAnalytic(): HasOne
+    {
+        return $this->hasOne(TermAnalytic::class);
+    }
+
+    public function MeetRecordingScreens(): HasMany
+    {
+        return $this->hasMany(MeetRecordingScreen::class);
+    }
 
     protected static function newFactory(): MeetRecordingFactory
     {

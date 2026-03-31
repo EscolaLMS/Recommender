@@ -107,6 +107,8 @@ class TermAnalyticResource extends JsonResource
             'rating' => $this->resource->rating ?? random_int(1, 5),
             'url' => $this->resource->url ?? null,
             'url_expiration_time_millis' => $this->resource->url_expiration_time_millis ?? null,
+            'start_at' => $this->resource->meetRecording->start_at ?? null,
+            'end_at' => $this->resource->meetRecording->end_at ?? null,
         ];
     }
 }

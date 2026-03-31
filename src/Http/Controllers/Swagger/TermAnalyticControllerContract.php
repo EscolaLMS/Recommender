@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Http\Controllers\Swagger;
 
+use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticListRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticRequest;
 use Illuminate\Http\JsonResponse;
@@ -233,4 +234,58 @@ interface TermAnalyticControllerContract
      * )
      */
     public function modelTermAnalytics(TermAnalyticRequest $request, string $modelType, int $modelId, int $term): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/recommender/analytics/aggregated-frames/{id}",
+     *      summary="Aggregated Frames with interval",
+     *      tags={"Admin Recommender"},
+     *      description="Get aggregated frames for model and term with interval",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *     @OA\Parameter(
+     *           name="id",
+     *           description="ID of term analytic",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="path"
+     *       ),
+     *     @OA\Parameter(
+     *           name="interval",
+     *           description="Interval",
+     *           @OA\Schema(
+     *              type="integer",
+     *          ),
+     *           required=true,
+     *           in="query"
+     *       ),
+     *      @OA\Response(
+     *           response=200,
+     *           description="successful operation",
+     *           @OA\MediaType(
+     *               mediaType="application/json"
+     *           ),
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   type="array",
+     *                   @OA\Items(ref="#/components/schemas/AggregatedFrame")
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     * )
+     */
+    public function aggregatedFrames(AggregatedFrameListRequest $request, int $id): JsonResponse;
 }
