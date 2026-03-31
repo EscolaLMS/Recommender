@@ -5,6 +5,7 @@ namespace EscolaLms\Recommender\Models;
 use EscolaLms\Recommender\Database\Factories\TermAnalyticFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TermAnalytic extends Model
 {
@@ -35,12 +36,18 @@ class TermAnalytic extends Model
         'max_emotion_value',
         'aggregated_frames_count',
         'last_frame_at',
+        'meet_recording_id',
     ];
 
     protected $casts = [
         'term' => 'datetime',
         'last_frame_at' => 'datetime',
     ];
+
+    public function meetRecording(): BelongsTo
+    {
+        return $this->belongsTo(MeetRecording::class);
+    }
 
     protected static function newFactory(): TermAnalyticFactory
     {

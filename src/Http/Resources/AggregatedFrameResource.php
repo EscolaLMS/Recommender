@@ -76,13 +76,13 @@ class AggregatedFrameResource extends JsonResource
     public function toArray($request): array
     {
         $emotions = [
-            EmotionsEnum::ANGRY => $this->avg_emotions_angry,
-            EmotionsEnum::DISGUSTED => $this->avg_emotions_disgusted,
-            EmotionsEnum::FEARFUL => $this->avg_emotions_fearful,
-            EmotionsEnum::HAPPY => $this->avg_emotions_happy,
-            EmotionsEnum::NEUTRAL => $this->avg_emotions_neutral,
-            EmotionsEnum::SAD => $this->avg_emotions_sad,
-            EmotionsEnum::SURPRISED => $this->avg_emotions_surprised,
+            EmotionsEnum::ANGRY => $this->resource->avg_emotions_angry,
+            EmotionsEnum::DISGUSTED => $this->resource->avg_emotions_disgusted,
+            EmotionsEnum::FEARFUL => $this->resource->avg_emotions_fearful,
+            EmotionsEnum::HAPPY => $this->resource->avg_emotions_happy,
+            EmotionsEnum::NEUTRAL => $this->resource->avg_emotions_neutral,
+            EmotionsEnum::SAD => $this->resource->avg_emotions_sad,
+            EmotionsEnum::SURPRISED => $this->resource->avg_emotions_surprised,
         ];
 
         $maxEmotion = null;
@@ -95,15 +95,17 @@ class AggregatedFrameResource extends JsonResource
         }
 
         return array_merge([
-            'window_start' => Carbon::parse($this->bucket_start)
+            'window_start' => Carbon::parse($this->resource->bucket_start)
                 ->utc()
                 ->format('Y-m-d\TH:i:s.u\Z'),
-            'window_end' => Carbon::parse($this->bucket_end)
+            'window_end' => Carbon::parse($this->resource->bucket_end)
                 ->utc()
                 ->format('Y-m-d\TH:i:s.u\Z'),
-            'attention' => $this->avg_attention,
+            'attention' => $this->resource->avg_attention,
             'max_emotion' => $maxEmotion,
             'max_emotion_percentage' => $maxValue,
+            'screen_path' => $this->resource->screen_path ?? null,
+            'screen_timestamp' => $this->resource->screen_timestamp ? Carbon::parse($this->resource->screen_timestamp)->utc()->format('Y-m-d\TH:i:s.u\Z') : null,
         ], $emotions);
     }
 }

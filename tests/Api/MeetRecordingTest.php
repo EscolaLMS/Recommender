@@ -89,6 +89,16 @@ class MeetRecordingTest extends TestCase
         $time = Carbon::now();
         $screenTime = Carbon::now()->addMinutes(10);
         $screenTime2 = Carbon::now()->addMinutes(15);
+
+        $meetRecording = MeetRecording::create([
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $time,
+            'start_at' => $time,
+            'end_at' => null,
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
         Storage::fake();
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings/screens', [
             'model_type' => 'consultation',

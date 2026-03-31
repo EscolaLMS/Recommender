@@ -13,9 +13,11 @@ use Illuminate\Support\Collection;
 
 interface TermAnalyticServiceContract
 {
+    public function updateTermAnalytic(string $modelType, int $modelId, Carbon $term, Carbon $startAt): void;
     public function rebuildTermAnalytic(string $modelType, int $modelId, Carbon $term): void;
     public function termAnalyticsList(string $modelType, TermAnalyticsFilterListDto $criteriaDto, PageDto $pageDto, OrderDto $orderDto): LengthAwarePaginator;
     public function termAnalytic(string $modelType, int $id): TermAnalytic;
     public function modelAnalytics(string $modelType, int $modelId, ?int $term = null): Collection|AggregatedFrame;
     public function modelAnalyticsForTerm(int $termAnalyticId): AggregatedFrame;
+    public function aggregatedFrames(int $termId, int $interval): Collection;
 }

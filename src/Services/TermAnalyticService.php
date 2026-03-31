@@ -7,6 +7,7 @@ use EscolaLms\Recommender\Dto\PageDto;
 use EscolaLms\Recommender\Dto\TermAnalyticsFilterListDto;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\Models\AggregatedFrame;
+use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Repositories\Contracts\TermAnalyticsRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
@@ -14,12 +15,109 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class TermAnalyticService implements TermAnalyticServiceContract
 {
     public function __construct(
         private TermAnalyticsRepositoryContract $termAnalyticsRepository,
     ) {}
+
+    public function updateTermAnalytic(string $modelType, int $modelId, Carbon $term, Carbon $startAt): void
+    {
+        DB::transaction(function () use ($modelType, $modelId, $term, $startAt) {
+           $meet = MeetRecording::query()
+               ->where('model_type', $modelType)
+               ->where('model_id', $modelId)
+               ->where('term', $term)
+               ->where('start_at', '<=', $startAt)
+               ->where(function ($query) use ($startAt) {
+                   $query
+                       ->whereNull('end_at')
+                       ->orWhere('end_at', '>=', $startAt);
+               })
+               ->orderByDesc('start_at')
+               ->firstOrFail();
+
+           $query = AggregatedFrame::query()
+               ->where('model_type', $modelType)
+               ->where('model_id', $modelId)
+               ->where('term', $term)
+               ->where('window_start', '>=', $meet->start_at);
+
+           if ($meet->end_at) {
+               $query->where('window_start', '<=', $meet->end_at);
+           }
+
+            $data = $query
+                ->selectRaw("
+                SUM(count) as count,
+                COUNT(id) as aggregated_frames_count,
+                MAX(updated_at) as last_frame_at,
+
+                SUM(sum_attention) as sum_attention,
+                SUM(sum_emotions_angry) as sum_emotions_angry,
+                SUM(sum_emotions_disgusted) as sum_emotions_disgusted,
+                SUM(sum_emotions_fearful) as sum_emotions_fearful,
+                SUM(sum_emotions_happy) as sum_emotions_happy,
+                SUM(sum_emotions_neutral) as sum_emotions_neutral,
+                SUM(sum_emotions_sad) as sum_emotions_sad,
+                SUM(sum_emotions_surprised) as sum_emotions_surprised
+            ")
+                ->first();
+
+            if (!$data || $data->count == 0) {
+                return;
+            }
+
+            $emotions = collect([
+                EmotionsEnum::ANGRY => $data->sum_emotions_angry,
+                EmotionsEnum::DISGUSTED => $data->sum_emotions_disgusted,
+                EmotionsEnum::FEARFUL => $data->sum_emotions_fearful,
+                EmotionsEnum::HAPPY => $data->sum_emotions_happy,
+                EmotionsEnum::NEUTRAL => $data->sum_emotions_neutral,
+                EmotionsEnum::SAD => $data->sum_emotions_sad,
+                EmotionsEnum::SURPRISED => $data->sum_emotions_surprised,
+            ]);
+
+            $maxEmotion = $emotions->sortDesc()->keys()->first();
+
+            $termAnalytic = TermAnalytic::updateOrCreate(
+                ['model_type' => $modelType, 'model_id' => $modelId, 'term' => $term, 'meet_recording_id' => $meet->getKey()],
+                [
+                    'count' => $data->count,
+                    'aggregated_frames_count' => $data->aggregated_frames_count,
+                    'sum_attention' => $data->sum_attention,
+
+                    'sum_emotions_angry' => $data->sum_emotions_angry,
+                    'sum_emotions_disgusted' => $data->sum_emotions_disgusted,
+                    'sum_emotions_fearful' => $data->sum_emotions_fearful,
+                    'sum_emotions_happy' => $data->sum_emotions_happy,
+                    'sum_emotions_neutral' => $data->sum_emotions_neutral,
+                    'sum_emotions_sad' => $data->sum_emotions_sad,
+                    'sum_emotions_surprised' => $data->sum_emotions_surprised,
+                    'avg_attention' => $data->sum_attention / $data->count,
+                    'avg_emotions_angry' => $data->sum_emotions_angry / $data->count,
+                    'avg_emotions_disgusted' => $data->sum_emotions_disgusted / $data->count,
+                    'avg_emotions_fearful' => $data->sum_emotions_fearful / $data->count,
+                    'avg_emotions_happy' => $data->sum_emotions_happy / $data->count,
+                    'avg_emotions_neutral' => $data->sum_emotions_neutral / $data->count,
+                    'avg_emotions_sad' => $data->sum_emotions_sad / $data->count,
+                    'avg_emotions_surprised' => $data->sum_emotions_surprised / $data->count,
+
+                    'max_emotion' => $maxEmotion,
+                    'max_emotion_value' => $emotions->get($maxEmotion) / $data->count,
+                    'last_frame_at' => $data->last_frame_at,
+                ]
+            );
+
+            $query
+                ->whereNull('term_analytic_id')
+                ->update([
+                    'term_analytic_id' => $termAnalytic->getKey(),
+                ]);
+        });
+    }
 
     public function rebuildTermAnalytic(string $modelType, int $modelId, Carbon $term): void
     {
@@ -209,6 +307,83 @@ class TermAnalyticService implements TermAnalyticServiceContract
         return $query
             ->groupBy('term')
             ->orderBy('term')
+            ->get();
+    }
+
+    public function aggregatedFrames(int $termId, int $interval): Collection
+    {
+        $termAnalytic = TermAnalytic::query()->findOrFail($termId);
+        $recordingId = $termAnalytic->meet_recording_id;
+
+        $sumColumns = [
+            'sum_attention',
+            'sum_emotions_angry',
+            'sum_emotions_disgusted',
+            'sum_emotions_fearful',
+            'sum_emotions_happy',
+            'sum_emotions_neutral',
+            'sum_emotions_sad',
+            'sum_emotions_surprised',
+        ];
+
+        $selectParts = [];
+
+        $pgsql = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        if ($pgsql) {
+            $selectParts[] = "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM window_start) / {$interval}) * {$interval}) AT TIME ZONE 'UTC' as bucket_start";
+        } else {
+            $selectParts[] = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(window_start)/{$interval})*{$interval}) as bucket_start";
+        }
+
+        $selectParts[] = "MAX(window_end) as bucket_end";
+        $selectParts[] = "SUM(count) as total_count";
+
+        foreach ($sumColumns as $sumColumn) {
+            $avgName = Str::replaceFirst('sum_', 'avg_', $sumColumn);
+
+            $selectParts[] = "SUM($sumColumn) as $sumColumn";
+            if ($pgsql) {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count)::numeric, 0) as $avgName";
+            } else {
+                $selectParts[] = "SUM($sumColumn) / NULLIF(SUM(count), 0) AS $avgName";
+            }
+        }
+
+        $selectRaw = implode(',', $selectParts);
+
+        $buckets = AggregatedFrame::query()
+            ->selectRaw($selectRaw)
+            ->where('term_analytic_id', $termId)
+            ->groupBy('bucket_start');
+
+        return DB::query()
+            ->fromSub($buckets, 'b')
+            ->select([
+                'b.*',
+
+                DB::raw("(
+                SELECT MIN(s.file_timestamp)
+                FROM meet_recording_screens s
+                WHERE s.meet_recording_id = {$recordingId}
+                AND s.file_timestamp >= b.bucket_start
+                AND s.file_timestamp <= b.bucket_end
+            ) as screen_timestamp"),
+
+                DB::raw("(
+                SELECT s.file_path
+                FROM meet_recording_screens s
+                WHERE s.meet_recording_id = {$recordingId}
+                AND s.file_timestamp = (
+                    SELECT MIN(s2.file_timestamp)
+                    FROM meet_recording_screens s2
+                    WHERE s2.meet_recording_id = {$recordingId}
+                    AND s2.file_timestamp >= b.bucket_start
+                    AND s2.file_timestamp <= b.bucket_end
+                )
+                LIMIT 1
+            ) as screen_path"),
+            ])
+            ->orderBy('b.bucket_start')
             ->get();
     }
 }
