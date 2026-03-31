@@ -6,6 +6,8 @@ use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Courses\Database\Seeders\CoursesPermissionSeeder;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Models\AggregatedFrame;
+use EscolaLms\Recommender\Models\MeetRecording;
+use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -170,6 +172,28 @@ class RecommenderControllerTest extends TestCase
 
         $admin = $this->makeAdmin();
 
+        $meet = MeetRecording::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'start_at' => $term,
+            'end_at' => $term->copy()->addHour(),
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
+
+        $termAnalytic = TermAnalytic::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'aggregated_frames_count' => 1,
+            'meet_recording_id' => $meet->getKey(),
+        ]);
+
         foreach (range(0, 3) as $i) {
             AggregatedFrame::factory()->create([
                 'model_type' => $modelType,
@@ -181,17 +205,18 @@ class RecommenderControllerTest extends TestCase
                 'count' => 1,
                 'sum_emotions_happy' => 0.5,
                 'sum_emotions_neutral' => 0.5,
+                'term_analytic_id' => $termAnalytic->getKey(),
             ]);
         }
 
-        $response = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=15");
+        $response = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{}?interval=15");
 
         $response->assertStatus(200);
         $data = $response->json('data');
 
         $this->assertCount(4, $data);
 
-        $response60 = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/aggregated-frames/{$modelType}/{$modelId}/{$term->timestamp}?interval=60");
+        $response60 = $this->actingAs($admin, 'api')->getJson("api/admin/recommender/analytics/aggregated-frames/{}?interval=60");
         $data60 = $response60->json('data');
 
         $this->assertCount(1, $data60);
