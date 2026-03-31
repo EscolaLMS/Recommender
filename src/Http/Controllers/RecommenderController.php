@@ -75,22 +75,4 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
 
         return $this->sendResponse(__('Meet recording screens saved successfully'));
     }
-
-    public function meetRecordings(MeetRecordingRequest $request): JsonResponse
-    {
-        $dto = new MeetRecordingDto($request->all());
-        $model = $this->recommenderService->meetRecording($dto);
-
-        return $this->sendResponseForResource(
-            MeetRecordingResource::make($model), __('Meet recording saved successfully')
-        );
-    }
-
-    public function meetRecordingScreen(MeetRecordingScreen $request): JsonResponse
-    {
-        $dto = new MeetRecordingScreenDto($request->all());
-        $this->recommenderService->meetRecordingScreen($dto);
-
-        return $this->sendResponse(__('Meet recording screens saved successfully'));
-    }
 }
