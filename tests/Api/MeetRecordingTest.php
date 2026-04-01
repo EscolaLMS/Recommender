@@ -100,7 +100,7 @@ class MeetRecordingTest extends TestCase
         $screenTime = Carbon::now()->addMinutes(10);
         $screenTime2 = Carbon::now()->addMinutes(15);
 
-        $meetRecording = MeetRecording::create([
+        $meetRecording = MeetRecording::factory()->create([
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time,
