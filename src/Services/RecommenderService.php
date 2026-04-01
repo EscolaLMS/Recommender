@@ -317,18 +317,19 @@ class RecommenderService implements RecommenderServiceContract
 
     public function meetRecording(MeetRecordingDto $dto): MeetRecording
     {
+        /** @var MeetRecording|null $meetRecording */
+        $meetRecording = MeetRecording::query()
+            ->where('model_type', $dto->getModelType())
+            ->where('model_id', $dto->getModelId())
+            ->where('term', $dto->getTerm())
+            ->whereNull('end_at')
+            ->latest('start_at')
+            ->first();
+
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
 
-            $exist = MeetRecording::query()
-                ->where('model_type', $dto->getModelType())
-                ->where('model_id', $dto->getModelId())
-                ->where('term', $dto->getTerm())
-                ->whereNull('end_at')
-                ->latest('start_at')
-                ->first();
-
-            if ($exist) {
-                throw new \RuntimeException('Active recording found for this term with ID: ' . $exist->getKey());
+            if ($meetRecording) {
+                throw new \RuntimeException('Active recording found for this term with ID: ' . $meetRecording->getKey());
             }
 
             /** @var MeetRecording $meet */
@@ -344,12 +345,9 @@ class RecommenderService implements RecommenderServiceContract
             return $meet;
         }
 
-        if (!$dto->getId()) {
+        if (!$meetRecording) {
             throw new ModelNotFoundException();
         }
-
-        /** @var MeetRecording $meetRecording */
-        $meetRecording = MeetRecording::query()->where('id', '=', $dto->getId())->firstOrFail();
 
         $meetRecording->update($dto->toArray());
 

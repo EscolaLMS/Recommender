@@ -39,7 +39,6 @@ class MeetRecordingRequest extends FormRequest
             'term' => ['required'],
             'url' => ['sometimes', 'url'],
             'url_expiration_time_millis' => ['sometimes', 'integer'],
-            'id' => ['sometimes', 'integer'],
         ];
     }
 }
