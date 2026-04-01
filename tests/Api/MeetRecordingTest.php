@@ -50,7 +50,7 @@ class MeetRecordingTest extends TestCase
     {
         $term = Carbon::now()->subMinutes(30);
         $start = Carbon::now()->subMinutes(15);
-        $meetRecording = MeetRecording::create([
+        $meetRecording = MeetRecording::factory()->create([
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,

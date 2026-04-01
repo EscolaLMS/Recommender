@@ -20,6 +20,7 @@ use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -329,7 +330,7 @@ class RecommenderService implements RecommenderServiceContract
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
 
             if ($meetRecording) {
-                throw new \RuntimeException('Active recording found for this term with ID: ' . $meetRecording->getKey());
+                throw new HttpClientException('Active recording found for this term with ID: ' . $meetRecording->getKey(), 422);
             }
 
             /** @var MeetRecording $meet */
@@ -345,7 +346,7 @@ class RecommenderService implements RecommenderServiceContract
             return $meet;
         }
 
-        if (!$meetRecording) {
+        if ($meetRecording === null) {
             throw new ModelNotFoundException();
         }
 
