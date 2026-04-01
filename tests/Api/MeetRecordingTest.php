@@ -60,6 +60,17 @@ class MeetRecordingTest extends TestCase
             'url_expiration_time_millis' => null,
         ]);
 
+        $this->assertDatabaseHas('meet_recordings', [
+            'id' => $meetRecording->getKey(),
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'start_at' => $start,
+            'end_at' => null,
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
+
         $now = Carbon::now()->format('Y-m-d H:i:s');
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
             'model_type' => 'consultation',
@@ -69,7 +80,6 @@ class MeetRecordingTest extends TestCase
             'action' => MeetRecordingEnum::END_RECORDING,
             'url' => 'http://test-recording.com',
             'url_expiration_time_millis' => 123456,
-            'id' => $meetRecording->getKey(),
         ])->assertOk();
 
         $this->assertDatabaseHas('meet_recordings', [
