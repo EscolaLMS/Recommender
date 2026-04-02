@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\Models\MeetRecording;
+use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -58,6 +59,13 @@ class MeetRecordingTest extends TestCase
             'end_at' => null,
             'url' => null,
             'url_expiration_time_millis' => null,
+        ]);
+
+        $termAnalytic = TermAnalytic::factory()->create([
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'meet_recording_id' => $meetRecording->getKey(),
         ]);
 
         $this->assertDatabaseHas('meet_recordings', [
