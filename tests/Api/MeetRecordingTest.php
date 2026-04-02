@@ -28,11 +28,12 @@ class MeetRecordingTest extends TestCase
     public function testCreateMeetRecording(): void
     {
         $term = Carbon::now()->subMinutes(30);
+        $now = Carbon::now()->format('Y-m-d H:i:s');
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
-            'start_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'start_at' => $now,
             'action' => MeetRecordingEnum::START_RECORDING,
         ])->assertCreated();
 
@@ -40,7 +41,43 @@ class MeetRecordingTest extends TestCase
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
-            'start_at' => Carbon::now(),
+            'start_at' => $now,
+            'end_at' => null,
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
+    }
+
+    public function testCreateNewMeetRecording(): void
+    {
+        $term = Carbon::now()->subMinutes(30)->format('Y-m-d H:i:s');
+        $start = Carbon::now()->subMinutes(15)->format('Y-m-d H:i:s');
+        $end = Carbon::now()->subMinutes(10)->format('Y-m-d H:i:s');
+        $meetRecording = MeetRecording::factory()->create([
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'start_at' => $start,
+            'end_at' => $end,
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
+        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'start_at' => $now,
+            'action' => MeetRecordingEnum::START_RECORDING,
+        ])->assertCreated();
+
+        $this->assertDatabaseCount('meet_recordings', 2);
+
+        $this->assertDatabaseHas('meet_recordings', [
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'start_at' => $now,
             'end_at' => null,
             'url' => null,
             'url_expiration_time_millis' => null,
