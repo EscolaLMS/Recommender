@@ -49,7 +49,7 @@ class MeetRecordingTest extends TestCase
 
     public function testUpdateMeetRecording(): void
     {
-        $term = Carbon::now()->subMinutes(30);
+        $term = Carbon::now()->subMinutes(30)->format('Y-m-d H:i:s');
         $start = Carbon::now()->subMinutes(15);
         $meetRecording = MeetRecording::factory()->create([
             'model_type' => 'consultation',
