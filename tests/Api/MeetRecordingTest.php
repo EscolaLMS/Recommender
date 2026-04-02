@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\Models\MeetRecording;
+use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -48,9 +49,27 @@ class MeetRecordingTest extends TestCase
 
     public function testUpdateMeetRecording(): void
     {
-        $term = Carbon::now()->subMinutes(30);
+        $term = Carbon::now()->subMinutes(30)->format('Y-m-d H:i:s');
         $start = Carbon::now()->subMinutes(15);
-        $meetRecording = MeetRecording::create([
+        $meetRecording = MeetRecording::factory()->create([
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'start_at' => $start,
+            'end_at' => null,
+            'url' => null,
+            'url_expiration_time_millis' => null,
+        ]);
+
+        $termAnalytic = TermAnalytic::factory()->create([
+            'model_type' => 'consultation',
+            'model_id' => 1,
+            'term' => $term,
+            'meet_recording_id' => $meetRecording->getKey(),
+        ]);
+
+        $this->assertDatabaseHas('meet_recordings', [
+            'id' => $meetRecording->getKey(),
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $term,
@@ -69,7 +88,6 @@ class MeetRecordingTest extends TestCase
             'action' => MeetRecordingEnum::END_RECORDING,
             'url' => 'http://test-recording.com',
             'url_expiration_time_millis' => 123456,
-            'id' => $meetRecording->getKey(),
         ])->assertOk();
 
         $this->assertDatabaseHas('meet_recordings', [
@@ -90,7 +108,7 @@ class MeetRecordingTest extends TestCase
         $screenTime = Carbon::now()->addMinutes(10);
         $screenTime2 = Carbon::now()->addMinutes(15);
 
-        $meetRecording = MeetRecording::create([
+        $meetRecording = MeetRecording::factory()->create([
             'model_type' => 'consultation',
             'model_id' => 1,
             'term' => $time,

@@ -14,7 +14,6 @@ class MeetRecordingDto extends BaseDto
     protected ?string $endAt = null;
     protected ?string $url = null;
     protected ?int $url_expiration_time_millis = null;
-    protected ?int $id;
 
     public function model(): MeetRecording
     {
@@ -106,15 +105,5 @@ class MeetRecordingDto extends BaseDto
     public function setUrlExpirationTimeMillis(?int $url_expiration_time_millis): void
     {
         $this->url_expiration_time_millis = $url_expiration_time_millis;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): void
-    {
-        $this->id = $id;
     }
 }

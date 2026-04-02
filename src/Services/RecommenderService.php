@@ -8,6 +8,7 @@ use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
+use EscolaLms\Recommender\Exceptions\MeetRecordingActiveException;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Jobs\UpdateTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
@@ -20,6 +21,7 @@ use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use EscolaLms\TopicTypes\Models\TopicContent\H5P;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -317,18 +319,19 @@ class RecommenderService implements RecommenderServiceContract
 
     public function meetRecording(MeetRecordingDto $dto): MeetRecording
     {
+        /** @var MeetRecording|null $meetRecording */
+        $meetRecording = MeetRecording::query()
+            ->where('model_type', $dto->getModelType())
+            ->where('model_id', $dto->getModelId())
+            ->where('term', $dto->getTerm())
+            ->whereNull('end_at')
+            ->latest('start_at')
+            ->first();
+
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
 
-            $exist = MeetRecording::query()
-                ->where('model_type', $dto->getModelType())
-                ->where('model_id', $dto->getModelId())
-                ->where('term', $dto->getTerm())
-                ->whereNull('end_at')
-                ->latest('start_at')
-                ->first();
-
-            if ($exist) {
-                throw new \RuntimeException('Active recording found for this term with ID: ' . $exist->getKey());
+            if ($meetRecording) {
+                throw new MeetRecordingActiveException('Active recording found for this term with ID: ' . $meetRecording->getKey(), 422);
             }
 
             /** @var MeetRecording $meet */
@@ -344,12 +347,9 @@ class RecommenderService implements RecommenderServiceContract
             return $meet;
         }
 
-        if (!$dto->getId()) {
+        if ($meetRecording === null) {
             throw new ModelNotFoundException();
         }
-
-        /** @var MeetRecording $meetRecording */
-        $meetRecording = MeetRecording::query()->where('id', '=', $dto->getId())->firstOrFail();
 
         $meetRecording->update($dto->toArray());
 
