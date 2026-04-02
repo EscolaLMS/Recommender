@@ -8,6 +8,7 @@ use EscolaLms\Recommender\Enum\EmotionsEnum;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
+use EscolaLms\Recommender\Exceptions\MeetRecordingActiveException;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Jobs\UpdateTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
@@ -330,7 +331,7 @@ class RecommenderService implements RecommenderServiceContract
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
 
             if ($meetRecording) {
-                throw new HttpClientException('Active recording found for this term with ID: ' . $meetRecording->getKey(), 422);
+                throw new MeetRecordingActiveException('Active recording found for this term with ID: ' . $meetRecording->getKey(), 422);
             }
 
             /** @var MeetRecording $meet */
