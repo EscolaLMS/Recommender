@@ -17,6 +17,7 @@ class MeetRecordingScreen extends Model
         'term',
         'file_path',
         'file_timestamp',
+        'meet_recording_id',
     ];
 
     protected $casts = [
