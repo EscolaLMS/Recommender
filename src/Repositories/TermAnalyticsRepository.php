@@ -6,23 +6,23 @@ use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Repositories\BaseRepository;
 use EscolaLms\Recommender\Dto\TermAnalyticsFilterListDto;
 use EscolaLms\Recommender\Models\TermAnalytic;
+use EscolaLms\Questionnaire\Models\QuestionAnswer;
+use EscolaLms\Questionnaire\Models\QuestionnaireModel;
+use EscolaLms\Questionnaire\Models\QuestionnaireModelType;
 use EscolaLms\Recommender\Repositories\Contracts\TermAnalyticsRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRepositoryContract
 {
-
-    public function getFieldsSearchable()
-    {
-        return [
-            //
-        ];
-    }
-
     public function model()
     {
         return TermAnalytic::class;
+    }
+
+    public function getFieldsSearchable()
+    {
+        return [];
     }
 
     public function findByCriteria(
@@ -30,20 +30,8 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
         TermAnalyticsFilterListDto $criteriaDto,
         int $perPage,
         ?OrderDto $orderDto = null
-    ): LengthAwarePaginator
-    {
-        $modelTable = $this->resolveModelTable($modelType);
-
-        $query = TermAnalytic::query()
-            ->with('meetRecording')
-            ->from('term_analytics as ta')
-            ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
-            ->where('ta.model_type', $modelType)
-            ->select([
-                'ta.*',
-                'm.name as model_name',
-            ]);
-
+    ): LengthAwarePaginator {
+        $query = $this->prepareQueryWithRating($modelType);
         $query = $this->applyCriteria($query, $criteriaDto->toArray());
 
         if ($orderDto) {
@@ -55,18 +43,42 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
 
     public function findById(string $modelType, int $id): TermAnalytic
     {
+        return $this->prepareQueryWithRating($modelType)
+            ->where('ta.id', $id)
+            ->firstOrFail();
+    }
+
+    private function prepareQueryWithRating(string $modelType): Builder
+    {
         $modelTable = $this->resolveModelTable($modelType);
+        $questionnaireTypeTitle = $this->resolveQuestionnaireTypeTitle($modelType);
+
+        $qaTable = (new QuestionAnswer())->getTable();
+        $qmTable = (new QuestionnaireModel())->getTable();
+        $qmtTable = (new QuestionnaireModelType())->getTable();
 
         return TermAnalytic::query()
             ->from('term_analytics as ta')
-            ->with('meetRecording')
             ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
-            ->where('ta.id', $id)
+            ->leftJoin('meet_recordings as mr', 'mr.id', '=', 'ta.meet_recording_id')
+            ->with('meetRecording')
             ->select([
                 'ta.*',
                 'm.name as model_name',
             ])
-            ->firstOrFail();
+            ->addSelect(['rating' => function ($query) use ($qaTable, $qmTable, $qmtTable, $questionnaireTypeTitle) {
+                $query->selectRaw('AVG(rate)')
+                    ->from($qaTable)
+                    ->join($qmTable, "$qmTable.id", '=', "$qaTable.questionnaire_model_id")
+                    ->join($qmtTable, "$qmtTable.id", '=', "$qmTable.model_type_id")
+                    ->whereColumn("$qmTable.model_id", 'ta.model_id')
+                    ->where("$qmtTable.title", $questionnaireTypeTitle)
+                    ->whereColumn("$qaTable.created_at", '>=', 'mr.start_at')
+                    ->where(function ($q) use ($qaTable) {
+                        $q->whereColumn("$qaTable.created_at", '<=', 'mr.end_at')
+                            ->orWhereNull('mr.end_at');
+                    });
+            }]);
     }
 
     private function resolveModelTable(string $modelType): string
@@ -75,6 +87,15 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
             'consultation' => 'consultations',
             'webinar' => 'webinars',
             default => throw new \RuntimeException('Invalid model type'),
+        };
+    }
+
+    private function resolveQuestionnaireTypeTitle(string $modelType): string
+    {
+        return match ($modelType) {
+            'consultation' => 'consultations',
+            'webinar' => 'webinar',
+            default => $modelType,
         };
     }
 
@@ -87,12 +108,10 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
         $column = match ($orderDto->getOrderBy()) {
             'name' => 'm.name',
             'term' => 'ta.term',
+            'rating' => 'rating',
             default => 'ta.model_id',
         };
 
-        return $query->orderBy(
-            $column,
-            $orderDto->getOrder() ?? 'asc'
-        );
+        return $query->orderBy($column, $orderDto->getOrder() ?? 'asc');
     }
 }
