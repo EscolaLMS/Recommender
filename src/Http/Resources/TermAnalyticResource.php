@@ -104,9 +104,9 @@ class TermAnalyticResource extends JsonResource
             'avg_emotions_surprised' => $this->resource->avg_emotions_surprised,
             'max_emotion' => $this->resource->max_emotion,
             'max_emotion_value' => $this->resource->max_emotion_value,
-            'rating' => $this->resource->rating ?? random_int(1, 5),
+            'rating' => $this->resource->rating ?? null,
             'url' => $this->resource->meetRecording && $this->resource->meetRecording->is_url_valid ? $this->resource->meetRecording->url : null,
-            'url_expires_at' => $this->resource->is_url_valid ? $this->resource->meetRecording->url_expires_at : null,
+            'url_expires_at' => $this->resource->meetRecording->is_url_valid ? $this->resource->meetRecording->url_expires_at : null,
             'start_at' => $this->resource->meetRecording->start_at ?? null,
             'end_at' => $this->resource->meetRecording->end_at ?? null,
         ];
