@@ -12,7 +12,6 @@ use EscolaLms\Questionnaire\Models\QuestionnaireModelType;
 use EscolaLms\Recommender\Repositories\Contracts\TermAnalyticsRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRepositoryContract
 {
@@ -61,6 +60,7 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
         return TermAnalytic::query()
             ->from('term_analytics as ta')
             ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
+            ->leftJoin('meet_recordings as mr', 'mr.id', '=', 'ta.meet_recording_id')
             ->with('meetRecording')
             ->select([
                 'ta.*',
@@ -73,15 +73,10 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
                     ->join($qmtTable, "$qmtTable.id", '=', "$qmTable.model_type_id")
                     ->whereColumn("$qmTable.model_id", 'ta.model_id')
                     ->where("$qmtTable.title", $questionnaireTypeTitle)
-                    ->whereExists(function ($sub) use ($qaTable) {
-                        $sub->select(DB::raw(1))
-                            ->from('meet_recordings as mr')
-                            ->whereColumn('mr.term_analytic_id', 'ta.id')
-                            ->whereColumn("$qaTable.created_at", '>=', 'mr.start_at')
-                            ->where(function ($q) use ($qaTable) {
-                                $q->whereColumn("$qaTable.created_at", '<=', 'mr.end_at')
-                                    ->orWhereNull('mr.end_at');
-                            });
+                    ->whereColumn("$qaTable.created_at", '>=', 'mr.start_at')
+                    ->where(function ($q) use ($qaTable) {
+                        $q->whereColumn("$qaTable.created_at", '<=', 'mr.end_at')
+                            ->orWhereNull('mr.end_at');
                     });
             }]);
     }
