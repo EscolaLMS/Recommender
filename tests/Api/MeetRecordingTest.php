@@ -95,7 +95,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $start,
             'end_at' => null,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
 
         $termAnalytic = TermAnalytic::factory()->create([
@@ -113,7 +112,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $start,
             'end_at' => null,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
 
         $now = Carbon::now()->format('Y-m-d H:i:s');
@@ -135,7 +133,7 @@ class MeetRecordingTest extends TestCase
             'start_at' => $start,
             'end_at' => $now,
             'url' => 'http://test-recording.com',
-            'url_expiration_time_millis' => 123456,
+            'url_expires_at' => Carbon::now()->addMilliseconds(123456)
         ]);
     }
 
@@ -152,7 +150,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $time,
             'end_at' => null,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
         Storage::fake();
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings/screens', [

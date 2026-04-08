@@ -268,7 +268,6 @@ class TermAnalyticTest extends TestCase
                     'model_name',
                     'rating',
                     'url',
-                    'url_expiration_time_millis',
                 ],
             ]);
     }
