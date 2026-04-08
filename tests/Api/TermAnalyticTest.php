@@ -235,6 +235,14 @@ class TermAnalyticTest extends TestCase
         $modelId = $consultation->getKey();
         $term = Carbon::now();
 
+        $meetRecording = MeetRecording::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'start_at' => Carbon::now()->subHour(),
+            'end_at' => Carbon::now(),
+        ]);
+
         $termAnalytic = TermAnalytic::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
@@ -244,6 +252,7 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
             'aggregated_frames_count' => 1,
+            'meet_recording_id' => $meetRecording->getKey(),
         ]);
 
         AggregatedFrame::factory()->create([
