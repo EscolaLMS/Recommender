@@ -351,7 +351,11 @@ class RecommenderService implements RecommenderServiceContract
             throw new ModelNotFoundException();
         }
 
-        $meetRecording->update($dto->toArray());
+        $data = [];
+        if ($dto->getUrlExpirationTimeMillis() !== null) {
+            $data['url_expires_at'] = Carbon::now()->addMilliseconds($dto->getUrlExpirationTimeMillis());
+        }
+        $meetRecording->update(array_merge($dto->toArray(), $data));
 
         if (!$meetRecording->termAnalytic()->exists()) {
             TermAnalytic::query()->create([
@@ -392,7 +396,7 @@ class RecommenderService implements RecommenderServiceContract
                 'model_id' => $dto->getModelId(),
                 'term' => $term,
                 'file_path' => $filePath,
-                'file_timestamp' => $file['timestamp'],
+                'file_timestamp' => Carbon::parse($file['timestamp'])->utc(),
                 'meet_recording_id' => $recording->getKey(),
             ]);
         };

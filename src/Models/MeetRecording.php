@@ -65,13 +65,19 @@ class MeetRecording extends Model
         'start_at',
         'end_at',
         'url',
-        'url_expiration_time_millis',
+        'url_expires_at',
     ];
 
     protected $casts = [
         'term' => 'datetime',
         'time' => 'datetime',
+        'url_expires_at' => 'datetime',
     ];
+
+    public function getIsUrlValidAttribute(): bool
+    {
+        return $this->url_expires_at && $this->url_expires_at->isFuture();
+    }
 
     public function termAnalytic(): HasOne
     {

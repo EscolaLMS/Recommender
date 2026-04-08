@@ -19,7 +19,7 @@ class MeetRecordingFactory extends Factory
             'model_id' => $this->faker->randomNumber(),
             'term' => $this->faker->dateTime(),
             'url' => $this->faker->url(),
-            'url_expiration_time_millis' => $this->faker->dateTime()->getTimestamp(),
+            'url_expires_at' => $this->faker->dateTime(),
         ];
     }
 }
