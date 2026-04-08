@@ -5,6 +5,7 @@ namespace EscolaLms\Recommender\Http\Resources;
 use Carbon\Carbon;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @OA\Schema(
@@ -104,7 +105,7 @@ class AggregatedFrameResource extends JsonResource
             'attention' => $this->resource->avg_attention,
             'max_emotion' => $maxEmotion,
             'max_emotion_percentage' => $maxValue,
-            'screen_path' => $this->resource->screen_path ?? null,
+            'screen_path' => $this->resource->screen_path ? Storage::url($this->resource->screen_path) : null,
             'screen_timestamp' => $this->resource->screen_timestamp ? Carbon::parse($this->resource->screen_timestamp)->utc()->format('Y-m-d\TH:i:s.u\Z') : null,
         ], $emotions);
     }

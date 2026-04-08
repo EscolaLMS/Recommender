@@ -35,6 +35,7 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
         $modelTable = $this->resolveModelTable($modelType);
 
         $query = TermAnalytic::query()
+            ->with('meetRecording')
             ->from('term_analytics as ta')
             ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
             ->where('ta.model_type', $modelType)
@@ -58,6 +59,7 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
 
         return TermAnalytic::query()
             ->from('term_analytics as ta')
+            ->with('meetRecording')
             ->join("$modelTable as m", 'm.id', '=', 'ta.model_id')
             ->where('ta.id', $id)
             ->select([

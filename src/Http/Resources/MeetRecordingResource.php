@@ -15,8 +15,7 @@ class MeetRecordingResource extends JsonResource
             'model_type' => $this->resource->model_type,
             'model_id' => $this->resource->model_id,
             'term' => $this->resource->term,
-            'url' => $this->resource->url,
-            'url_expiration_time_millis' => $this->resource->url_expiration_time_millis,
+            'url' => $this->resource->is_url_valid ? $this->resource->url : null,
         ];
     }
 }
