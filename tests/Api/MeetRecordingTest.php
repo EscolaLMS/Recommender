@@ -44,7 +44,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $now,
             'end_at' => null,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
     }
 
@@ -60,7 +59,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $start,
             'end_at' => $end,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
         $now = Carbon::now()->format('Y-m-d H:i:s');
         $this->actingAs($this->makeAdmin(), 'api')->postJson('api/recommender/meet-recordings', [
@@ -80,7 +78,6 @@ class MeetRecordingTest extends TestCase
             'start_at' => $now,
             'end_at' => null,
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
     }
 

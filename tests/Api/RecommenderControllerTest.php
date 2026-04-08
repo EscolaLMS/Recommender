@@ -179,7 +179,6 @@ class RecommenderControllerTest extends TestCase
             'start_at' => $term,
             'end_at' => $term->copy()->addHour(),
             'url' => null,
-            'url_expiration_time_millis' => null,
         ]);
 
         $termAnalytic = TermAnalytic::factory()->create([
