@@ -34,7 +34,7 @@ class MeetRecordingScreen extends FormRequest
             'term' => ['required'],
             'files' => ['array', 'min:1'],
             'files.*.file' => ['required'],
-            'files.*.timestamp' => ['required', 'date_format:Y-m-d H:i:s'],
+            'files.*.timestamp' => ['required'],
         ];
     }
 }
