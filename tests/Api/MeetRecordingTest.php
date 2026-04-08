@@ -162,11 +162,11 @@ class MeetRecordingTest extends TestCase
             'files' => [
                 [
                     'file' => UploadedFile::fake()->image('image.jpg'),
-                    'timestamp' => $screenTime->format('Y-m-d H:i:s'),
+                    'timestamp' => $screenTime->copy()->setTimezone('Europe/Warsaw')->toIso8601String(),
                 ],
                 [
                     'file' => UploadedFile::fake()->image('image.jpg'),
-                    'timestamp' => $screenTime2->format('Y-m-d H:i:s'),
+                    'timestamp' => $screenTime2->copy()->setTimezone('Europe/Warsaw')->toIso8601String(),
                 ]
             ]
         ])
