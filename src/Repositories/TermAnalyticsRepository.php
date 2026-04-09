@@ -78,7 +78,8 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
                         $q->whereColumn("$qaTable.created_at", '<=', 'mr.end_at')
                             ->orWhereNull('mr.end_at');
                     });
-            }]);
+            }])
+            ->where('ta.model_type', $modelType);
     }
 
     private function resolveModelTable(string $modelType): string
