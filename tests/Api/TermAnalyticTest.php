@@ -32,6 +32,17 @@ class TermAnalyticTest extends TestCase
         $modelId = 21;
         $term = Carbon::now();
 
+        $startAt = Carbon::now();
+        $endAt = Carbon::now()->addHour();
+
+        $meetRecordingConsultation = MeetRecording::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+        ]);
+
         $termConsultation = TermAnalytic::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
@@ -41,10 +52,19 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
+            'meet_recording_id' => $meetRecordingConsultation->getKey(),
         ]);
 
         $modelTypeWebinar = 'webinar';
         $modelWebinarId = 22;
+
+        $meetRecordingWebinar = MeetRecording::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
+            'term' => $term,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+        ]);
 
         $termWebinar = TermAnalytic::factory()->create([
             'model_type' => $modelTypeWebinar,
@@ -55,6 +75,7 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
+            'meet_recording_id' => $meetRecordingWebinar->getKey(),
         ]);
 
         $this
