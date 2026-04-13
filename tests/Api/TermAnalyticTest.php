@@ -55,6 +55,18 @@ class TermAnalyticTest extends TestCase
             'meet_recording_id' => $meetRecordingConsultation->getKey(),
         ]);
 
+        AggregatedFrame::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
+        ]);
+
         $modelTypeWebinar = 'webinar';
         $modelWebinarId = 22;
 
@@ -76,6 +88,18 @@ class TermAnalyticTest extends TestCase
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
             'meet_recording_id' => $meetRecordingWebinar->getKey(),
+        ]);
+
+        AggregatedFrame::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
         ]);
 
         $this
