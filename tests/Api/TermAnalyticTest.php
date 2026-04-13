@@ -32,9 +32,23 @@ class TermAnalyticTest extends TestCase
         $modelId = 21;
         $term = Carbon::now();
 
-        TermAnalytic::factory()->create([
+        $termConsultation = TermAnalytic::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'aggregated_frames_count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+        ]);
+
+        $modelTypeWebinar = 'webinar';
+        $modelWebinarId = 22;
+
+        $termWebinar = TermAnalytic::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
             'term' => $term,
             'sum_attention' => 1,
             'count' => 1,
@@ -46,7 +60,16 @@ class TermAnalyticTest extends TestCase
         $this
             ->actingAs($this->makeAdmin(), 'api')
             ->getJson("api/admin/recommender/terms/{$modelType}")
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonMissing(['model_type' => $modelTypeWebinar, 'model_id' => $modelWebinarId, 'id' => $termWebinar->getKey()]);
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson("api/admin/recommender/terms/{$modelTypeWebinar}")
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonMissing(['model_type' => $modelType, 'model_id' => $modelId, 'id' => $termConsultation->getKey()]);
     }
 
     public function testRebuildTermAnalytic(): void
