@@ -116,14 +116,14 @@ class TermAnalyticTest extends TestCase
             ->getJson("api/admin/recommender/terms/{$modelType}")
             ->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonMissing(['model_type' => $modelTypeWebinar, 'model_id' => $modelWebinarId, 'id' => $termWebinar->getKey()]);
+            ->assertJsonMissing(['model_type' => $modelTypeWebinar, 'id' => $termWebinar->getKey()]);
 
         $this
             ->actingAs($this->makeAdmin(), 'api')
             ->getJson("api/admin/recommender/terms/{$modelTypeWebinar}")
             ->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonMissing(['model_type' => $modelType, 'model_id' => $modelId, 'id' => $termConsultation->getKey()]);
+            ->assertJsonMissing(['model_type' => $modelType, 'id' => $termConsultation->getKey()]);
     }
 
     public function testRebuildTermAnalytic(): void
