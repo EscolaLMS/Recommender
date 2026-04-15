@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
+use App\Models\Webinar;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Tests\CreatesUsers;
@@ -29,11 +30,15 @@ class TermAnalyticTest extends TestCase
     public function testTermAnalyticList(): void
     {
         $modelType = 'consultation';
-        $modelId = 21;
         $term = Carbon::now();
 
         $startAt = Carbon::now();
         $endAt = Carbon::now()->addHour();
+
+        $consultation = Consultation::factory()->create([
+            'name' => 'Consultation test',
+        ]);
+        $modelId = $consultation->getKey();
 
         $meetRecordingConsultation = MeetRecording::factory()->create([
             'model_type' => $modelType,
@@ -68,7 +73,11 @@ class TermAnalyticTest extends TestCase
         ]);
 
         $modelTypeWebinar = 'webinar';
-        $modelWebinarId = 22;
+
+        $webinar = Webinar::factory()->create([
+            'name' => 'Webinar test',
+        ]);
+        $modelWebinarId = $webinar->getKey();
 
         $meetRecordingWebinar = MeetRecording::factory()->create([
             'model_type' => $modelTypeWebinar,
