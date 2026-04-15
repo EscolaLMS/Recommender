@@ -5,6 +5,7 @@ namespace EscolaLms\Recommender\Tests\Api;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
+use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Tests\CreatesCourse;
@@ -12,6 +13,8 @@ use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class MeetRecordingTest extends TestCase
@@ -83,6 +86,10 @@ class MeetRecordingTest extends TestCase
 
     public function testUpdateMeetRecording(): void
     {
+        Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.frames_microservice_url', 'http://localhost-frames');
+
+        Http::fake(['http://localhost-frames/api/frames/satisfaction' => Http::response(null, 204)]);
+
         $term = Carbon::now()->subMinutes(30)->format('Y-m-d H:i:s');
         $start = Carbon::now()->subMinutes(15);
         $meetRecording = MeetRecording::factory()->create([

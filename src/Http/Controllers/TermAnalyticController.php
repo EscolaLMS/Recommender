@@ -3,8 +3,10 @@
 namespace EscolaLms\Recommender\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Recommender\Dto\SatisfactionDto;
 use EscolaLms\Recommender\Http\Controllers\Swagger\TermAnalyticControllerContract;
 use EscolaLms\Recommender\Http\Requests\AggregatedFrameListRequest;
+use EscolaLms\Recommender\Http\Requests\SatisfactionSaveRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticListRequest;
 use EscolaLms\Recommender\Http\Requests\TermAnalyticRequest;
 use EscolaLms\Recommender\Http\Resources\AggregatedFrameResource;
@@ -12,6 +14,7 @@ use EscolaLms\Recommender\Http\Resources\ModelAnalyticsResource;
 use EscolaLms\Recommender\Http\Resources\TermAnalyticResource;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class TermAnalyticController extends EscolaLmsBaseController implements TermAnalyticControllerContract
 {
@@ -54,5 +57,14 @@ class TermAnalyticController extends EscolaLmsBaseController implements TermAnal
         $data = $this->termAnalyticService->modelAnalyticsForTerm($term);
 
         return $this->sendResponseForResource(ModelAnalyticsResource::make($data), __('Term analytics retrieved successfully'));
+    }
+
+    public function satisfaction(SatisfactionSaveRequest $request): \Illuminate\Http\Response
+    {
+        $dto = SatisfactionDto::instantiateFromRequest($request);
+
+        $this->termAnalyticService->saveSatisfaction($dto);
+
+        return Response::noContent();
     }
 }

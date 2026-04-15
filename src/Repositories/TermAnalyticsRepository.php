@@ -51,11 +51,6 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
     private function prepareQueryWithRating(string $modelType): Builder
     {
         $modelTable = $this->resolveModelTable($modelType);
-        $questionnaireTypeTitle = $this->resolveQuestionnaireTypeTitle($modelType);
-
-        $qaTable = (new QuestionAnswer())->getTable();
-        $qmTable = (new QuestionnaireModel())->getTable();
-        $qmtTable = (new QuestionnaireModelType())->getTable();
 
         return TermAnalytic::query()
             ->from('term_analytics as ta')
@@ -66,19 +61,6 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
                 'ta.*',
                 'm.name as model_name',
             ])
-            ->addSelect(['rating' => function ($query) use ($qaTable, $qmTable, $qmtTable, $questionnaireTypeTitle) {
-                $query->selectRaw('AVG(rate)')
-                    ->from($qaTable)
-                    ->join($qmTable, "$qmTable.id", '=', "$qaTable.questionnaire_model_id")
-                    ->join($qmtTable, "$qmtTable.id", '=', "$qmTable.model_type_id")
-                    ->whereColumn("$qmTable.model_id", 'ta.model_id')
-                    ->where("$qmtTable.title", $questionnaireTypeTitle)
-                    ->whereColumn("$qaTable.created_at", '>=', 'mr.start_at')
-                    ->where(function ($q) use ($qaTable) {
-                        $q->whereColumn("$qaTable.created_at", '<=', 'mr.end_at')
-                            ->orWhereNull('mr.end_at');
-                    });
-            }])
             ->where('ta.model_type', $modelType);
     }
 

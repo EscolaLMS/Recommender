@@ -37,6 +37,9 @@ class TermAnalytic extends Model
         'aggregated_frames_count',
         'last_frame_at',
         'meet_recording_id',
+        'mean_predicted_rating',
+        'satisfaction_status',
+        'satisfaction_requested_at',
     ];
 
     protected $casts = [

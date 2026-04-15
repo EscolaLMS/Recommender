@@ -12,6 +12,8 @@ use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
+use EscolaLms\Webinar\Database\Seeders\WebinarsPermissionSeeder;
+use EscolaLms\Webinar\Models\Webinar;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 
@@ -24,15 +26,31 @@ class TermAnalyticTest extends TestCase
         parent::setUp();
 
         $this->seed(ConsultationsPermissionSeeder::class);
+        $this->seed(WebinarsPermissionSeeder::class);
     }
 
     public function testTermAnalyticList(): void
     {
         $modelType = 'consultation';
-        $modelId = 21;
         $term = Carbon::now();
 
-        TermAnalytic::factory()->create([
+        $startAt = Carbon::now();
+        $endAt = Carbon::now()->addHour();
+
+        $consultation = Consultation::factory()->create([
+            'name' => 'Consultation test',
+        ]);
+        $modelId = $consultation->getKey();
+
+        $meetRecordingConsultation = MeetRecording::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+        ]);
+
+        $termConsultation = TermAnalytic::factory()->create([
             'model_type' => $modelType,
             'model_id' => $modelId,
             'term' => $term,
@@ -41,12 +59,73 @@ class TermAnalyticTest extends TestCase
             'aggregated_frames_count' => 1,
             'sum_emotions_happy' => 0.6,
             'sum_emotions_sad' => 0.4,
+            'meet_recording_id' => $meetRecordingConsultation->getKey(),
+        ]);
+
+        AggregatedFrame::factory()->create([
+            'model_type' => $modelType,
+            'model_id' => $modelId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
+        ]);
+
+        $modelTypeWebinar = 'webinar';
+
+        $webinar = Webinar::factory()->create([
+            'name' => 'Webinar test',
+        ]);
+        $modelWebinarId = $webinar->getKey();
+
+        $meetRecordingWebinar = MeetRecording::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
+            'term' => $term,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+        ]);
+
+        $termWebinar = TermAnalytic::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'aggregated_frames_count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'meet_recording_id' => $meetRecordingWebinar->getKey(),
+        ]);
+
+        AggregatedFrame::factory()->create([
+            'model_type' => $modelTypeWebinar,
+            'model_id' => $modelWebinarId,
+            'term' => $term,
+            'sum_attention' => 1,
+            'count' => 1,
+            'sum_emotions_happy' => 0.6,
+            'sum_emotions_sad' => 0.4,
+            'window_start' => $startAt->copy()->addSeconds(15),
+            'window_end' => $startAt->copy()->addSeconds(30),
         ]);
 
         $this
             ->actingAs($this->makeAdmin(), 'api')
             ->getJson("api/admin/recommender/terms/{$modelType}")
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonMissing(['model_type' => $modelTypeWebinar, 'id' => $termWebinar->getKey()]);
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson("api/admin/recommender/terms/{$modelTypeWebinar}")
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonMissing(['model_type' => $modelType, 'id' => $termConsultation->getKey()]);
     }
 
     public function testRebuildTermAnalytic(): void

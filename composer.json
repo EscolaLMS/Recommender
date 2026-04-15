@@ -11,7 +11,6 @@
     "escolalms/settings": "^0",
     "escolalms/consultations": "^0",
     "escolalms/webinar": "^0",
-    "escolalms/questionnaire": "^0",
     "laravel/framework": ">=8.0"
   },
   "require-dev": {
