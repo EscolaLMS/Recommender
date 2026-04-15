@@ -12,6 +12,7 @@ use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
+use EscolaLms\Webinar\Database\Seeders\WebinarsPermissionSeeder;
 use EscolaLms\Webinar\Models\Webinar;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
@@ -25,6 +26,7 @@ class TermAnalyticTest extends TestCase
         parent::setUp();
 
         $this->seed(ConsultationsPermissionSeeder::class);
+        $this->seed(WebinarsPermissionSeeder::class);
     }
 
     public function testTermAnalyticList(): void
