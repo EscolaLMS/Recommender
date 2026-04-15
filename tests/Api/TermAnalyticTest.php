@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Recommender\Tests\Api;
 
-use App\Models\Webinar;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Tests\CreatesUsers;
@@ -13,6 +12,7 @@ use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use EscolaLms\Recommender\Tests\CreatesCourse;
 use EscolaLms\Recommender\Tests\TestCase;
+use EscolaLms\Webinar\Models\Webinar;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 
