@@ -10,6 +10,7 @@ use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\MeetRecordingActiveException;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
+use EscolaLms\Recommender\Jobs\PredictSatisfactionJob;
 use EscolaLms\Recommender\Jobs\UpdateTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\MeetRecording;
@@ -364,7 +365,10 @@ class RecommenderService implements RecommenderServiceContract
                 'term' => $dto->getTerm(),
                 'meet_recording_id' => $meetRecording->getKey(),
             ]);
+            $meetRecording->refresh();
         }
+
+        PredictSatisfactionJob::dispatch($meetRecording->termAnalytic);
 
         return $meetRecording;
     }

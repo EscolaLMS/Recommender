@@ -3,6 +3,7 @@
 namespace EscolaLms\Recommender;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
+use EscolaLms\Recommender\Console\Commands\RetrySatisfactionJobCommand;
 use EscolaLms\Recommender\Http\Middleware\VerifySignature;
 use EscolaLms\Recommender\Providers\AuthServiceProvider;
 use EscolaLms\Recommender\Providers\EventServiceProvider;
@@ -67,5 +68,9 @@ class EscolaLmsRecommenderServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config.php' => config_path(self::CONFIG_KEY . '.php'),
         ], self::CONFIG_KEY . '.config');
+
+        $this->commands([
+            RetrySatisfactionJobCommand::class,
+        ]);
     }
 }

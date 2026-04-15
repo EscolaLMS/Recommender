@@ -23,5 +23,6 @@ Route::prefix('api/recommender')->group(function () {
 
     Route::middleware('verifySignature')->group(function () {
         Route::post('/aggregated-frames/save', [RecommenderController::class, 'aggregateFrameSave']);
+        Route::post('/satisfaction', [TermAnalyticController::class, 'satisfaction']);
     });
 });

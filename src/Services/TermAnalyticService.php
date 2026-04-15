@@ -4,17 +4,23 @@ namespace EscolaLms\Recommender\Services;
 
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Recommender\Dto\PageDto;
+use EscolaLms\Recommender\Dto\PredictSatisfactionDto;
+use EscolaLms\Recommender\Dto\SatisfactionDto;
 use EscolaLms\Recommender\Dto\TermAnalyticsFilterListDto;
 use EscolaLms\Recommender\Enum\EmotionsEnum;
+use EscolaLms\Recommender\Enum\SatisfactionStatusEnum;
+use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Repositories\Contracts\TermAnalyticsRepositoryContract;
 use EscolaLms\Recommender\Services\Contracts\TermAnalyticServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class TermAnalyticService implements TermAnalyticServiceContract
@@ -385,5 +391,38 @@ class TermAnalyticService implements TermAnalyticServiceContract
             ])
             ->orderBy('b.bucket_start')
             ->get();
+    }
+
+    public function saveSatisfaction(SatisfactionDto $dto): void
+    {
+        TermAnalytic::query()->where('id', $dto->getTermAnalyticId())->update([
+            'mean_predicted_rating' => $dto->getMeanPredictedRating(),
+        ]);
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function predictSatisfaction(TermAnalytic $termAnalytic): void
+    {
+        $dto = PredictSatisfactionDto::instantiateFromArray([
+            'model_type' => $termAnalytic->model_type,
+            'model_id' => $termAnalytic->model_id,
+            'term' => $termAnalytic->term,
+            'start_at' => $termAnalytic->meetRecording->start_at,
+            'end_at' => $termAnalytic->meetRecording->end_at,
+            'api_url' => config('app.url'),
+            'term_analytic_id' => $termAnalytic->getKey(),
+        ]);
+        $response = Http::post(config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.frames_microservice_url') . '/api/frames/satisfaction', $dto->toArray());
+
+        if ($response->successful()) {
+            $termAnalytic->update([
+                'satisfaction_status' => SatisfactionStatusEnum::SENT,
+                'satisfaction_requested_at' => Carbon::now(),
+            ]);
+        }
+
+        $response->throw();
     }
 }
