@@ -85,14 +85,14 @@ class TermAnalyticsRepository extends BaseRepository implements TermAnalyticsRep
     private function orderBy(Builder $query, ?OrderDto $orderDto): Builder
     {
         if (!$orderDto || !$orderDto->getOrderBy()) {
-            return $query->orderBy('ta.model_id', 'desc');
+            return $query->orderBy('ta.id', 'desc');
         }
 
         $column = match ($orderDto->getOrderBy()) {
             'name' => 'm.name',
             'term' => 'ta.term',
             'rating' => 'rating',
-            default => 'ta.model_id',
+            default => 'ta.id',
         };
 
         return $query->orderBy($column, $orderDto->getOrder() ?? 'asc');
