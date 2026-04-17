@@ -35,7 +35,7 @@ class AggregatedFrameStored implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'should_break' => $this->aggregatedFrame->should_break,
+            'should_break' => $this->aggregatedFrame->should_break ?? false,
             'break_confidence' => $this->aggregatedFrame->break_confidence,
             'recommended_in_minutes' => $this->aggregatedFrame->recommended_in_minutes,
             'window_start' => $this->aggregatedFrame->window_start,

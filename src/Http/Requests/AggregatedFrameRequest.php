@@ -40,12 +40,12 @@ class AggregatedFrameRequest extends FormRequest
             'median_emotions_sad' => ['required', 'numeric'],
             'median_emotions_surprised' => ['required', 'numeric'],
             'aggregated_at' => ['required'],
-            'should_break' => ['required'],
-            'break_confidence' => ['required', 'numeric'],
+            'should_break' => ['nullable', 'boolean'],
+            'break_confidence' => ['nullable', 'numeric'],
             'recommended_in_minutes' => ['nullable'],
-            'reasoning' => ['required'],
-            'algorithm' => ['required'],
-            'processing_time_ms' => ['required'],
+            'reasoning' => ['nullable'],
+            'algorithm' => ['nullable'],
+            'processing_time_ms' => ['nullable'],
             'external_id' => ['required'],
         ];
     }
