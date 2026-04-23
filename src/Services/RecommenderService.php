@@ -11,6 +11,7 @@ use EscolaLms\Recommender\Events\AggregatedFrameStored;
 use EscolaLms\Recommender\Exceptions\MeetRecordingActiveException;
 use EscolaLms\Recommender\Exceptions\RecommenderDisabledException;
 use EscolaLms\Recommender\Jobs\PredictSatisfactionJob;
+use EscolaLms\Recommender\Jobs\ProcessingMeetingFramesJob;
 use EscolaLms\Recommender\Jobs\UpdateTermAnalyticJob;
 use EscolaLms\Recommender\Models\AggregatedFrame;
 use EscolaLms\Recommender\Models\MeetRecording;
@@ -369,6 +370,7 @@ class RecommenderService implements RecommenderServiceContract
         }
 
         PredictSatisfactionJob::dispatch($meetRecording->termAnalytic);
+        ProcessingMeetingFramesJob::dispatch($meetRecording);
 
         return $meetRecording;
     }
