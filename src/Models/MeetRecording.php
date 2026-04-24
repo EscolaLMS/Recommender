@@ -71,6 +71,8 @@ class MeetRecording extends Model
     protected $casts = [
         'term' => 'datetime',
         'time' => 'datetime',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
         'url_expires_at' => 'datetime',
     ];
 

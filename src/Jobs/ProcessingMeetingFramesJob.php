@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -41,6 +40,16 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             return;
         }
 
+        try {
+            if (Http::head($directVideoUrl)->failed()) {
+                Log::error("Direct video link expired or returned 404: {$directVideoUrl}");
+                return;
+            }
+        } catch (\Exception $e) {
+            Log::error("Connection error to direct video URL: " . $e->getMessage());
+            return;
+        }
+
         $duration = (float) shell_exec("ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($directVideoUrl));
         if ($duration <= 0) return;
 
@@ -64,7 +73,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
         sort($files);
 
         $folder = "{$this->meetRecording->model_type}/{$this->meetRecording->model_id}/" .
-            Carbon::make($this->meetRecording->term)->getTimestamp() . "/presentation";
+            $this->meetRecording->term->getTimestamp() . "/presentation";
 
         foreach ($files as $index => $file) {
             $name = basename($file);
@@ -82,7 +91,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
                 continue;
             }
 
-            $currentFrameTimestamp = Carbon::parse($this->meetRecording->start_at)->addSeconds($offset);
+            $currentFrameTimestamp = $this->meetRecording->start_at->copy()->addSeconds($offset);
             $fullS3Path = "{$folder}/" . $currentFrameTimestamp->getTimestamp() . ".jpg";
 
             try {
@@ -95,7 +104,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
                             'model_type' => $this->meetRecording->model_type,
                             'model_id' => $this->meetRecording->model_id,
                             'term' => $this->meetRecording->term,
-                            'file_timestamp' => $currentFrameTimestamp->utc(),
+                            'file_timestamp' => $currentFrameTimestamp,
                             'meet_recording_id' => $this->meetRecording->getKey(),
                         ]
                     );
