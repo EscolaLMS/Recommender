@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Recommender\Enum\MeetRecordingEnum;
 use EscolaLms\Recommender\EscolaLmsRecommenderServiceProvider;
+use EscolaLms\Recommender\Jobs\ProcessingMeetingFramesJob;
 use EscolaLms\Recommender\Models\MeetRecording;
 use EscolaLms\Recommender\Models\TermAnalytic;
 use EscolaLms\Recommender\Tests\CreatesCourse;
@@ -13,6 +14,7 @@ use EscolaLms\Recommender\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -86,6 +88,10 @@ class MeetRecordingTest extends TestCase
 
     public function testUpdateMeetRecording(): void
     {
+        Bus::fake([
+            ProcessingMeetingFramesJob::class
+        ]);
+
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.frames_microservice_url', 'http://localhost-frames');
 
         Http::fake(['http://localhost-frames/api/frames/satisfaction' => Http::response(null, 204)]);
@@ -139,6 +145,8 @@ class MeetRecordingTest extends TestCase
             'url' => 'http://test-recording.com',
             'url_expires_at' => Carbon::now()->addMilliseconds(123456)
         ]);
+
+        Bus::assertDispatched(ProcessingMeetingFramesJob::class);
     }
 
     public function testMeetRecordingScreen(): void
