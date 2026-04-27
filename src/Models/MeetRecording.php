@@ -66,6 +66,7 @@ class MeetRecording extends Model
         'end_at',
         'url',
         'url_expires_at',
+        'processing_video',
     ];
 
     protected $casts = [

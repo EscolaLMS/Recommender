@@ -17,6 +17,7 @@ class MeetRecordingResource extends JsonResource
             'term' => $this->resource->term,
             'url' => $this->resource->is_url_valid ? $this->resource->url : null,
             'url_expires_at' => $this->resource->is_url_valid ? $this->resource->url_expires_at : null,
+            'processing_video' => $this->resource->processing_video,
         ];
     }
 }

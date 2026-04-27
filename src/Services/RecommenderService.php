@@ -356,6 +356,7 @@ class RecommenderService implements RecommenderServiceContract
         $data = [];
         if ($dto->getUrlExpirationTimeMillis() !== null) {
             $data['url_expires_at'] = Carbon::now()->addMilliseconds($dto->getUrlExpirationTimeMillis());
+            $data['processing_video'] = true;
         }
         $meetRecording->update(array_merge($dto->toArray(), $data));
 
