@@ -48,10 +48,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *            type="string",
  *        ),
  *     @OA\Property(
- *            property="url_expiration_time_millis",
- *            description="url_expiration_time_millis",
- *            type="integer",
+ *            property="url_expires_at",
+ *            description="url_expires_at",
+ *            type="datetime",
  *        ),
+ *     @OA\Property(
+ *             property="processing_video",
+ *             description="processing_video",
+ *             type="bool",
+ *         ),
  * )
  */
 class MeetRecording extends Model

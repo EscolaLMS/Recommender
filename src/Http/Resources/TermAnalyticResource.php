@@ -109,6 +109,7 @@ class TermAnalyticResource extends JsonResource
             'url_expires_at' => $this->resource->meetRecording->is_url_valid ? $this->resource->meetRecording->url_expires_at : null,
             'start_at' => $this->resource->meetRecording->start_at ?? null,
             'end_at' => $this->resource->meetRecording->end_at ?? null,
+            'processing_video' => $this->resource->meetRecording->processing_video,
         ];
     }
 }
