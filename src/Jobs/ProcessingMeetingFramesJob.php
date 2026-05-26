@@ -29,7 +29,12 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
     public function handle()
     {
-        if (!$this->meetRecording->url) return;
+        Log::info('Start processing meeting Frames for meetRecording: ' . $this->meetRecording->getKey());
+
+        if (!$this->meetRecording->url) {
+            Log::warning('No url for meetRecording, processing end');
+            return;
+        }
 
         $this->meetRecording->update(['processing_video' => true]);
 
@@ -38,6 +43,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             preg_match('/DOWNLOAD_RECORDING_URLS = "\[(.*?)\]";/', $html, $matches);
             if (empty($matches[1])) return;
             $directVideoUrl = str_contains($matches[1], ',') ? explode(',', $matches[1])[0] : $matches[1];
+            Log::info('Direct video url: ' . $directVideoUrl);
 
             if (Http::head($directVideoUrl)->failed()) {
                 Log::error("Direct video link expired or returned 404: {$directVideoUrl}");
@@ -45,9 +51,13 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             }
 
             $duration = (float) shell_exec("ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($directVideoUrl));
+            Log::info('Duration: ' . $duration);
+
             if ($duration <= 0) return;
 
             $tempDir = storage_path('app/temp/f_' . $this->meetRecording->getKey() . '_' . Str::random(5));
+            Log::info('Temp dir: ' . $tempDir);
+
             if (!file_exists($tempDir)) mkdir($tempDir, 0777, true);
 
             $outputPattern = $tempDir . '/f_%03d.jpg';
@@ -58,6 +68,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             exec($mainCommand);
 
             $lastFrameFile = $tempDir . '/f_last.jpg';
+            Log::info('Last frame file: ' . $lastFrameFile);
             $lastCommand = "ffmpeg -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -sseof -1 -i " .
                 escapeshellarg($directVideoUrl) . " -update 1 -frames:v 1 -an -sn " .
                 escapeshellarg($lastFrameFile) . " > /dev/null 2>&1";
@@ -68,6 +79,8 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
             $folder = "{$this->meetRecording->model_type}/{$this->meetRecording->model_id}/" .
                 $this->meetRecording->term->getTimestamp() . "/presentation";
+
+            Log::info('folder: ' . $folder);
 
             foreach ($files as $index => $file) {
                 $name = basename($file);
@@ -86,7 +99,9 @@ class ProcessingMeetingFramesJob implements ShouldQueue
                 }
 
                 $currentFrameTimestamp = $this->meetRecording->start_at->copy()->addSeconds($offset);
+                Log::info('current frame timestamp: ' . $currentFrameTimestamp);
                 $fullS3Path = "{$folder}/" . $currentFrameTimestamp->getTimestamp() . ".jpg";
+                Log::info('full s3 path: ' . $fullS3Path);
 
                 try {
                     DB::transaction(function () use ($file, $fullS3Path, $currentFrameTimestamp) {
@@ -117,6 +132,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             throw $e;
         } finally {
             $this->meetRecording->update(['processing_video' => false]);
+            Log::info('Processing meet recording end for ' . $this->meetRecording->getKey());
         }
     }
 
