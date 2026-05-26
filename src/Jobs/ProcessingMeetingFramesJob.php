@@ -36,9 +36,9 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             return;
         }
 
-        $this->meetRecording->update(['processing_video' => true]);
-
         try {
+            $this->meetRecording->update(['processing_video' => true]);
+
             $html = Http::get($this->meetRecording->url)->body();
             preg_match('/DOWNLOAD_RECORDING_URLS = "\[(.*?)\]";/', $html, $matches);
             if (empty($matches[1])) return;
@@ -138,6 +138,7 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
     public function failed(\Throwable $exception)
     {
+        Log::error('Processing meet recording failed ' . $this->meetRecording->getKey(), ['exception' => $exception->getMessage()]);
         $this->meetRecording->update(['processing_video' => false]);
     }
 }
