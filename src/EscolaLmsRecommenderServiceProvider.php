@@ -4,7 +4,7 @@ namespace EscolaLms\Recommender;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Recommender\Console\Commands\RetrySatisfactionJobCommand;
-use EscolaLms\Recommender\Console\Commands\StartProcessingMeetingFramesCommand;
+use EscolaLms\Recommender\Console\Commands\StartProcessingMeetFramesJobCommand;
 use EscolaLms\Recommender\Http\Middleware\VerifySignature;
 use EscolaLms\Recommender\Providers\AuthServiceProvider;
 use EscolaLms\Recommender\Providers\EventServiceProvider;
@@ -72,7 +72,7 @@ class EscolaLmsRecommenderServiceProvider extends ServiceProvider
 
         $this->commands([
             RetrySatisfactionJobCommand::class,
-            StartProcessingMeetingFramesCommand::class,
+            StartProcessingMeetFramesJobCommand::class,
         ]);
     }
 }

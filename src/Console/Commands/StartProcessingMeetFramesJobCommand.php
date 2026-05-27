@@ -6,7 +6,7 @@ use EscolaLms\Recommender\Jobs\ProcessingMeetingFramesJob;
 use EscolaLms\Recommender\Models\MeetRecording;
 use Illuminate\Console\Command;
 
-class StartProcessingMeetingFramesCommand extends Command
+class StartProcessingMeetFramesJobCommand extends Command
 {
     protected $signature = 'recommender:start-processing {id? : ID MeetRecording}';
     protected $description = 'start processing meeting Frames';
