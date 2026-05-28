@@ -21,6 +21,10 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
     public $timeout = 3600;
 
+    public $tries = 5;
+
+    public $backoff = [60, 120, 300, 600];
+
     public function __construct(
         protected MeetRecording $meetRecording
     ) {
@@ -29,10 +33,21 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
     public function handle()
     {
-        Log::info('Start processing meeting Frames for meetRecording: ' . $this->meetRecording->getKey());
+        Log::info('Start processing meeting Frames for meetRecording: ' . $this->meetRecording->getKey(), [
+            'attempt' => $this->attempts(),
+        ]);
+
+        $this->meetRecording->refresh();
 
         if (!$this->meetRecording->url) {
-            Log::warning('No url for meetRecording, processing end');
+            Log::warning('No url for meetRecording: ' . $this->meetRecording->getKey() . ', processing end');
+            return;
+        }
+
+        if ($this->meetRecording->url_expires_at && $this->meetRecording->url_expires_at->isPast()) {
+            Log::error('Recording URL has expired for meetRecording: ' . $this->meetRecording->getKey(), [
+                'url_expires_at' => $this->meetRecording->url_expires_at,
+            ]);
             return;
         }
 
@@ -41,7 +56,19 @@ class ProcessingMeetingFramesJob implements ShouldQueue
 
             $html = Http::get($this->meetRecording->url)->body();
             preg_match('/DOWNLOAD_RECORDING_URLS = "\[(.*?)\]";/', $html, $matches);
-            if (empty($matches[1])) return;
+
+            if (empty($matches[1])) {
+                Log::warning('DOWNLOAD_RECORDING_URLS not found in Jitsi page for meetRecording: ' . $this->meetRecording->getKey(), [
+                    'attempt' => $this->attempts(),
+                    'url'     => $this->meetRecording->url,
+                ]);
+
+                $this->meetRecording->update(['processing_video' => false]);
+                $delay = $this->backoff[$this->attempts() - 1] ?? 3600;
+                $this->release($delay);
+                return;
+            }
+
             $directVideoUrl = str_contains($matches[1], ',') ? explode(',', $matches[1])[0] : $matches[1];
             Log::info('Direct video url: ' . $directVideoUrl);
 
@@ -53,7 +80,13 @@ class ProcessingMeetingFramesJob implements ShouldQueue
             $duration = (float) shell_exec("ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($directVideoUrl));
             Log::info('Duration: ' . $duration);
 
-            if ($duration <= 0) return;
+            if ($duration <= 0) {
+                Log::error('ffprobe returned invalid duration for meetRecording: ' . $this->meetRecording->getKey(), [
+                    'duration'        => $duration,
+                    'directVideoUrl'  => $directVideoUrl,
+                ]);
+                return;
+            }
 
             $tempDir = storage_path('app/temp/f_' . $this->meetRecording->getKey() . '_' . Str::random(5));
             Log::info('Temp dir: ' . $tempDir);

@@ -371,7 +371,7 @@ class RecommenderService implements RecommenderServiceContract
         }
 
         PredictSatisfactionJob::dispatch($meetRecording->termAnalytic);
-        ProcessingMeetingFramesJob::dispatch($meetRecording);
+        ProcessingMeetingFramesJob::dispatch($meetRecording)->delay(Carbon::now()->addSeconds(30));
 
         return $meetRecording;
     }
