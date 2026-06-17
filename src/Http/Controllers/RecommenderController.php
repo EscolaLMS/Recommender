@@ -17,6 +17,7 @@ use EscolaLms\Recommender\Http\Resources\TopicRecommendationResource;
 use EscolaLms\Recommender\Services\Contracts\RecommenderServiceContract;
 use EscolaLms\Recommender\Dto\AggregatedFrameDto;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
 class RecommenderController extends EscolaLmsBaseController implements RecommenderControllerSwagger
@@ -58,6 +59,7 @@ class RecommenderController extends EscolaLmsBaseController implements Recommend
 
     public function meetRecordings(MeetRecordingRequest $request): JsonResponse
     {
+        Log::info('[POST] /api/recommender/meet-recordings with', ['request_data' => $request->all()]);
         $dto = new MeetRecordingDto($request->all());
         $model = $this->recommenderService->meetRecording($dto);
 

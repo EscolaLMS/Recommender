@@ -28,6 +28,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -321,6 +322,7 @@ class RecommenderService implements RecommenderServiceContract
 
     public function meetRecording(MeetRecordingDto $dto): MeetRecording
     {
+        Log::info('meetRecording service', ['dto' => $dto->toArray()]);
         /** @var MeetRecording|null $meetRecording */
         $meetRecording = MeetRecording::query()
             ->where('model_type', $dto->getModelType())
@@ -330,7 +332,10 @@ class RecommenderService implements RecommenderServiceContract
             ->latest('start_at')
             ->first();
 
+        Log::info('found meetRecording: ' . $meetRecording ? 'true' : 'false');
+
         if ($dto->getAction() === MeetRecordingEnum::START_RECORDING) {
+            Log::info('Action Start recording');
 
             if ($meetRecording) {
                 throw new MeetRecordingActiveException('Active recording found for this term with ID: ' . $meetRecording->getKey(), 422);
@@ -348,8 +353,10 @@ class RecommenderService implements RecommenderServiceContract
 
             return $meet;
         }
+        Log::info('Action end recording');
 
         if ($meetRecording === null) {
+            Log::info('MeetRecording not found');
             throw new ModelNotFoundException();
         }
 
@@ -358,9 +365,12 @@ class RecommenderService implements RecommenderServiceContract
             $data['url_expires_at'] = Carbon::now()->addMilliseconds($dto->getUrlExpirationTimeMillis());
             $data['processing_video'] = true;
         }
+        Log::info('MeetRecording additional data: ' . json_encode($data));
         $meetRecording->update(array_merge($dto->toArray(), $data));
+        Log::info('Updated meetRecording', ['meetRecording' => $meetRecording]);
 
         if (!$meetRecording->termAnalytic()->exists()) {
+            Log::info('No term term Analytic in MeetRecording');
             TermAnalytic::query()->create([
                 'model_type' => $dto->getModelType(),
                 'model_id' => $dto->getModelId(),
@@ -370,9 +380,12 @@ class RecommenderService implements RecommenderServiceContract
             $meetRecording->refresh();
         }
 
+        Log::info('Dispatching PredictSatisfactionJob');
         PredictSatisfactionJob::dispatch($meetRecording->termAnalytic);
+        Log::info('Dispatching ProcessingMeetingFramesJob');
         ProcessingMeetingFramesJob::dispatch($meetRecording)->delay(Carbon::now()->addSeconds(30));
 
+        Log::info('Returning meetRecording', ['meetRecording' => $meetRecording]);
         return $meetRecording;
     }
 
