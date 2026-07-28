@@ -15,15 +15,17 @@ class PredictSatisfactionDto implements DtoContract
     protected int $term_analytic_id;
 
     /**
-     * @param string $model_type
-     * @param int $model_id
-     * @param string $term
-     * @param string $start_at
-     * @param string $end_at
-     * @param string $api_url
-     * @param int $term_analytic_id
+     * Satisfaction model IDs to score (one or many).
+     * Frames sends them to Makaruk as `model` (one) or `models` (many).
+     *
+     * @var string[]
      */
-    public function __construct(string $model_type, int $model_id, string $term, string $start_at, string $end_at, string $api_url, int $term_analytic_id)
+    protected array $satisfaction_models;
+
+    /**
+     * @param string[] $satisfaction_models
+     */
+    public function __construct(string $model_type, int $model_id, string $term, string $start_at, string $end_at, string $api_url, int $term_analytic_id, array $satisfaction_models = [])
     {
         $this->model_type = $model_type;
         $this->model_id = $model_id;
@@ -32,6 +34,7 @@ class PredictSatisfactionDto implements DtoContract
         $this->end_at = $end_at;
         $this->api_url = $api_url;
         $this->term_analytic_id = $term_analytic_id;
+        $this->satisfaction_models = $satisfaction_models;
     }
 
     public function getModelType(): string
@@ -69,6 +72,14 @@ class PredictSatisfactionDto implements DtoContract
         return $this->term_analytic_id;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getSatisfactionModels(): array
+    {
+        return $this->satisfaction_models;
+    }
+
     public function toArray(): array
     {
         return [
@@ -79,6 +90,7 @@ class PredictSatisfactionDto implements DtoContract
             'end_at' => $this->end_at,
             'api_url' => $this->api_url,
             'term_analytic_id' => $this->term_analytic_id,
+            'satisfaction_models' => $this->satisfaction_models,
         ];
     }
 
@@ -91,7 +103,8 @@ class PredictSatisfactionDto implements DtoContract
             $data['start_at'],
             $data['end_at'],
             $data['api_url'],
-            $data['term_analytic_id']
+            $data['term_analytic_id'],
+            $data['satisfaction_models'] ?? []
         );
     }
 }

@@ -44,6 +44,7 @@ class SettingsTest extends TestCase
         $apiUrl = $this->faker->url;
         $courseModel = '{"data": "course"}';
         $exerciseModel = '{"data": "exercise"}';
+        $satisfactionModels = ['prod_elasticnet' => true, 'retrained_ridge3' => false, 'retrained_rf13' => false];
 
         $this->actingAs($user, 'api')
             ->postJson('/api/admin/config',
@@ -64,6 +65,10 @@ class SettingsTest extends TestCase
                         [
                             'key' => $configKey . '.exercise_model',
                             'value' => $exerciseModel,
+                        ],
+                        [
+                            'key' => $configKey . '.satisfaction_models',
+                            'value' => $satisfactionModels,
                         ],
                     ]
                 ]
@@ -112,6 +117,16 @@ class SettingsTest extends TestCase
                             'string'
                         ],
                         'value' => $exerciseModel,
+                        'readonly' => false,
+                    ],
+                    'satisfaction_models' => [
+                        'full_key' => $configKey . '.satisfaction_models',
+                        'key' => 'satisfaction_models',
+                        'public' => false,
+                        'rules' => [
+                            'array'
+                        ],
+                        'value' => $satisfactionModels,
                         'readonly' => false,
                     ],
                 ],

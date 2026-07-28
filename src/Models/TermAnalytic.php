@@ -40,11 +40,13 @@ class TermAnalytic extends Model
         'mean_predicted_rating',
         'satisfaction_status',
         'satisfaction_requested_at',
+        'satisfaction_models',
     ];
 
     protected $casts = [
         'term' => 'datetime',
         'last_frame_at' => 'datetime',
+        'satisfaction_models' => 'array',
     ];
 
     public function meetRecording(): BelongsTo

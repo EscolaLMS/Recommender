@@ -11,6 +11,7 @@ class SatisfactionSaveRequest extends FormRequest
         return [
             'term_analytic_id' => ['required'],
             'mean_predicted_rating' => ['required', 'numeric'],
+            'satisfaction_models' => ['nullable', 'array'],
         ];
     }
 }
