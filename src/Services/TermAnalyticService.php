@@ -397,6 +397,7 @@ class TermAnalyticService implements TermAnalyticServiceContract
     {
         TermAnalytic::query()->where('id', $dto->getTermAnalyticId())->update([
             'mean_predicted_rating' => $dto->getMeanPredictedRating(),
+            'satisfaction_models' => json_encode($dto->getSatisfactionModels()),
         ]);
     }
 
@@ -405,6 +406,13 @@ class TermAnalyticService implements TermAnalyticServiceContract
      */
     public function predictSatisfaction(TermAnalytic $termAnalytic): void
     {
+        // The satisfaction setting is a {model: bool} map; selected models are those set to true.
+        // The whole downstream path (frames, Makaruk, storage) works on a list of IDs, so multi-model
+        // support is already in place; enabling more models is just a matter of changing this setting.
+        $satisfactionModelsMap = config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.satisfaction_models');
+        $satisfactionModelsMap = is_array($satisfactionModelsMap) ? $satisfactionModelsMap : [];
+        $satisfactionModels = array_values(array_keys(array_filter($satisfactionModelsMap)));
+
         $dto = PredictSatisfactionDto::instantiateFromArray([
             'model_type' => $termAnalytic->model_type,
             'model_id' => $termAnalytic->model_id,
@@ -413,6 +421,7 @@ class TermAnalyticService implements TermAnalyticServiceContract
             'end_at' => $termAnalytic->meetRecording->end_at,
             'api_url' => config('app.url'),
             'term_analytic_id' => $termAnalytic->getKey(),
+            'satisfaction_models' => $satisfactionModels,
         ]);
         $response = Http::post(config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.frames_microservice_url') . '/api/frames/satisfaction', $dto->toArray());
 
