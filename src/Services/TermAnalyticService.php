@@ -406,12 +406,18 @@ class TermAnalyticService implements TermAnalyticServiceContract
      */
     public function predictSatisfaction(TermAnalytic $termAnalytic): void
     {
-        // The satisfaction setting is a {model: bool} map; selected models are those set to true.
-        // The whole downstream path (frames, Makaruk, storage) works on a list of IDs, so multi-model
-        // support is already in place; enabling more models is just a matter of changing this setting.
-        $satisfactionModelsMap = config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.satisfaction_models');
-        $satisfactionModelsMap = is_array($satisfactionModelsMap) ? $satisfactionModelsMap : [];
-        $satisfactionModels = array_values(array_keys(array_filter($satisfactionModelsMap)));
+        // The satisfaction setting is a list of {model, enabled} entries. It is a list (not a map)
+        // so it round-trips through the administrable-config "array" type and the admin panel, the
+        // same way video.bitrates does. Selected models are the enabled ones. The whole downstream
+        // path (frames, Makaruk, storage) works on a plain list of model IDs, so multi-model support
+        // is already in place; enabling more models is just flipping "enabled" in this setting.
+        $satisfactionModelsConfig = config(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.satisfaction_models');
+        $satisfactionModels = collect(is_array($satisfactionModelsConfig) ? $satisfactionModelsConfig : [])
+            ->filter(fn ($entry) => is_array($entry) && ($entry['enabled'] ?? false))
+            ->map(fn ($entry) => $entry['model'] ?? null)
+            ->filter()
+            ->values()
+            ->all();
 
         $dto = PredictSatisfactionDto::instantiateFromArray([
             'model_type' => $termAnalytic->model_type,

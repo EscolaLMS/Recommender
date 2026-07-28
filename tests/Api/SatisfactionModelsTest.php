@@ -75,7 +75,11 @@ class SatisfactionModelsTest extends TestCase
         Config::set(EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.frames_microservice_url', 'http://frames.test');
         Config::set(
             EscolaLmsRecommenderServiceProvider::CONFIG_KEY . '.satisfaction_models',
-            ['prod_elasticnet' => true, 'retrained_ridge3' => true, 'retrained_rf13' => false]
+            [
+                ['model' => 'prod_elasticnet', 'enabled' => true],
+                ['model' => 'retrained_ridge3', 'enabled' => true],
+                ['model' => 'retrained_rf13', 'enabled' => false],
+            ]
         );
 
         Http::fake(['http://frames.test/api/frames/satisfaction' => Http::response([], 200)]);
