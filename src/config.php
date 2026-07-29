@@ -5,8 +5,8 @@ return [
     'signature_secret' => env('RECOMMENDER_SIGNATURE_SECRET', ''),
     'frames_microservice_url' => env('RECOMMENDER_FRAMES_MICROSERVICE_URL', ''),
     'satisfaction_models' => [
-        'prod_elasticnet' => true,
-        'retrained_ridge3' => false,
-        'retrained_rf13' => false,
+        ['model' => 'prod_elasticnet', 'enabled' => true],
+        ['model' => 'retrained_ridge3', 'enabled' => false],
+        ['model' => 'retrained_rf13', 'enabled' => false],
     ],
 ];
