@@ -88,6 +88,10 @@ class TermAnalyticResource extends JsonResource
 {
     public function toArray($request): array
     {
+        // Format every rating with 5 decimal places, matching the mean_predicted_rating
+        // decimal(10,5) column, so the scalar "rating" and the per-model "ratings" are identical.
+        $formatRating = fn ($value) => $value === null ? null : number_format((float) $value, 5, '.', '');
+
         return [
             'id' => $this->resource->getKey(),
             'term' => $this->resource->term,
@@ -104,8 +108,15 @@ class TermAnalyticResource extends JsonResource
             'avg_emotions_surprised' => $this->resource->avg_emotions_surprised,
             'max_emotion' => $this->resource->max_emotion,
             'max_emotion_value' => $this->resource->max_emotion_value,
-            'rating' => $this->resource->mean_predicted_rating ?? null,
-            'ratings' => $this->resource->satisfaction_models ?? [],
+            'rating' => $formatRating($this->resource->mean_predicted_rating ?? null),
+            'ratings' => collect($this->resource->satisfaction_models ?? [])
+                ->map(function ($entry) use ($formatRating) {
+                    if (is_array($entry) && array_key_exists('mean_predicted_rating', $entry)) {
+                        $entry['mean_predicted_rating'] = $formatRating($entry['mean_predicted_rating']);
+                    }
+                    return $entry;
+                })
+                ->all(),
             'url' => $this->resource->meetRecording && $this->resource->meetRecording->is_url_valid ? $this->resource->meetRecording->url : null,
             'url_expires_at' => $this->resource->meetRecording->is_url_valid ? $this->resource->meetRecording->url_expires_at : null,
             'start_at' => $this->resource->meetRecording->start_at ?? null,
