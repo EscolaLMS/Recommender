@@ -112,6 +112,7 @@ class SatisfactionModelsTest extends TestCase
             ->assertOk()
             ->assertJsonStructure(['data' => ['rating', 'ratings']])
             ->assertJsonCount(1, 'data.ratings')
-            ->assertJsonPath('data.ratings.0.model', 'prod_elasticnet');
+            ->assertJsonPath('data.ratings.0.model', 'prod_elasticnet')
+            ->assertJsonPath('data.ratings.0.mean_predicted_rating', '7.42000');
     }
 }
